@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SmartDevelopment.Dal.MongoDb;
@@ -95,7 +96,7 @@ namespace SmartDevelopment.SampleApp.AspCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging();
+            services.AddLogging(loggingBuilder => loggingBuilder.AddApplicationInsights());
 
             AddConfiguration(services);
 
@@ -143,7 +144,7 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             services.AddResponseCaching();
 
-            //services.AddLogger();
+            services.AddLogger();
 
             services.AddDependencyTrackingWithApplicationInsights();
 

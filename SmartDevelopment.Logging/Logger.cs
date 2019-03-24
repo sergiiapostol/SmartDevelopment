@@ -13,7 +13,7 @@ namespace SmartDevelopment.Logging
     {
         private const string MessageKey = "message";
 
-        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILogger<TSource> _logger;
 
         private readonly LoggerSettings _loggerSettings;
 
