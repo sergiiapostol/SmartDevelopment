@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <ApplicationInsightsResourceId>/subscriptions/87c4793b-2300-49e6-958e-6ba8caad67ce/resourcegroups/Default-ApplicationInsights-EastUS/providers/microsoft.insights/components/SmartDevelopment.SampleApp.AspCore</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/87c4793b-2300-49e6-958e-6ba8caad67ce/resourcegroups/Default-ApplicationInsights-EastUS/providers/microsoft.insights/components/SmartDevelopment.SampleApp.AspCore</ApplicationInsightsAnnotationResourceId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartDevelopment.Dal.MongoDb\SmartDevelopment.Dal.MongoDb.csproj" />
+    <ProjectReference Include="..\SmartDevelopment.DependencyTracking.MongoDb\SmartDevelopment.DependencyTracking.MongoDb.csproj" />
+    <ProjectReference Include="..\SmartDevelopment.Identity\SmartDevelopment.Identity.csproj" />
+    <ProjectReference Include="..\SmartDevelopment.Logging\SmartDevelopment.Logging.csproj" />
+    <ProjectReference Include="..\SmartDevelopment.Profiling\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
+  </ItemGroup>
+
+</Project>

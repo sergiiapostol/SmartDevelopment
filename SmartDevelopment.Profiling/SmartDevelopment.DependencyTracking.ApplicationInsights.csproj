@@ -5,14 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.9.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartDevelopment.Dal.MongoDb\SmartDevelopment.Dal.MongoDb.csproj" />
     <ProjectReference Include="..\SmartDevelopment.DependencyTracking.Abstraction\SmartDevelopment.DependencyTracking.csproj" />
   </ItemGroup>
 

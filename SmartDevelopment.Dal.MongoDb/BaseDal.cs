@@ -16,9 +16,9 @@ namespace SmartDevelopment.Dal.MongoDb
     public abstract class BaseDal<TEntity> : IMongoDbDal<TEntity>, IDisposable
         where TEntity : class, IDbEntity
     {
-        protected readonly MongoDatabaseFactory DatabaseFactory;
+        protected readonly IMongoDatabaseFactory DatabaseFactory;
 
-        protected BaseDal(MongoDatabaseFactory databaseFactory)
+        protected BaseDal(IMongoDatabaseFactory databaseFactory)
         {
             DatabaseFactory = databaseFactory;
         }

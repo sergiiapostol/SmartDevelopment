@@ -6,14 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SmartDevelopment.Dal.MongoDb\SmartDevelopment.Dal.MongoDb.csproj" />
-    <ProjectReference Include="..\SmartDevelopment.DependencyTracking.Abstraction\SmartDevelopment.DependencyTracking.csproj" />
   </ItemGroup>
 
 </Project>

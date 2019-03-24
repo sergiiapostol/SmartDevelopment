@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -6,7 +7,12 @@ using MongoDB.Driver;
 
 namespace SmartDevelopment.Dal.MongoDb
 {
-    public class MongoDatabaseFactory
+    public interface IMongoDatabaseFactory
+    {
+        IMongoDatabase Get();
+    }
+
+    public class MongoDatabaseFactory : IMongoDatabaseFactory
     {
         private readonly IMongoClientFactory _clientFactory;
         private readonly ConnectionSettings _connectionSettings;
@@ -15,9 +21,9 @@ namespace SmartDevelopment.Dal.MongoDb
 
         private readonly object _lock = new object();
 
-        public MongoDatabaseFactory(ConnectionSettings connectionSettings, IMongoClientFactory clientFactory)
+        public MongoDatabaseFactory(IOptions<ConnectionSettings> connectionSettings, IMongoClientFactory clientFactory)
         {
-            _connectionSettings = connectionSettings;
+            _connectionSettings = connectionSettings.Value;
             _clientFactory = clientFactory;
             BsonSerializer.RegisterSerializer(typeof(decimal), new DecimalSerializer(BsonType.Decimal128));
             BsonSerializer.RegisterSerializer(typeof(decimal?), new NullableSerializer<decimal>(new DecimalSerializer(BsonType.Decimal128)));

@@ -6,13 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SmartDevelopment.Dal.Abstractions\SmartDevelopment.Dal.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

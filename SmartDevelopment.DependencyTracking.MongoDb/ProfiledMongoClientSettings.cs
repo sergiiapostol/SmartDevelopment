@@ -5,7 +5,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Events;
-using SmartDevelopment.DependencyTracking.Abstraction;
 
 namespace SmartDevelopment.DependencyTracking.MongoDb
 {
@@ -13,16 +12,16 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
     {
         private readonly ConcurrentDictionary<int, string> _queriesBuffer = new ConcurrentDictionary<int, string>();
 
-        private readonly IDependencyTracker _dependencyTracker;
+        private readonly DependencyProfiler _dependencyProfiler;
 
         private readonly string _dependencyName;
 
-        public ProfiledMongoClientSettings(IDependencyTracker dependencyTracker, string dependencyName,
+        public ProfiledMongoClientSettings(DependencyProfiler dependencyProfiler, string dependencyName,
             IEnumerable<string> commandsToIgnore)
         {
             _dependencyName = dependencyName;
-            _dependencyTracker = dependencyTracker ??
-                                 throw new ArgumentNullException($"{nameof(dependencyTracker)} is required");
+            _dependencyProfiler = dependencyProfiler ??
+                                 throw new ArgumentNullException($"{nameof(dependencyProfiler)} is required");
             var ignoredCommands = (commandsToIgnore ?? Enumerable.Empty<string>())
                 .Select(v => v.ToLower()).ToImmutableHashSet();
 
@@ -82,7 +81,7 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
 
         private void OnCommandCompleted(MongoCommandCompletedEventArgs args)
         {
-            _dependencyTracker.Dependency(_dependencyName, args.CommandName, args.Query, args.Success, args.Duration);
+            _dependencyProfiler.Dependency(_dependencyName, args.CommandName, args.Query, args.Success, args.Duration);
         }
 
         internal readonly Action<CommandStartedEvent> OnCommandStartEvent;

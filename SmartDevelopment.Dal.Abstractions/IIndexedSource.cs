@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace SmartDevelopment.Dal.Abstractions
 {
     public interface IIndexedSource
     {
-        void EnsureIndex();
+        Task EnsureIndex();
     }
 }

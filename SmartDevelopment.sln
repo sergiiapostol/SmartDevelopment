@@ -7,9 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.Dal.MongoD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.Dal.Abstractions", "SmartDevelopment.Dal.Abstractions\SmartDevelopment.Dal.Abstractions.csproj", "{25289D70-C9B4-427E-9F1A-F0121C738CF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.DependencyTracking.Abstraction", "SmartDevelopment.DependencyTracking.Abstraction\SmartDevelopment.DependencyTracking.Abstraction.csproj", "{499EC9D6-6E25-4AFB-898A-34322CCEF1EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.DependencyTracking", "SmartDevelopment.DependencyTracking.Abstraction\SmartDevelopment.DependencyTracking.csproj", "{499EC9D6-6E25-4AFB-898A-34322CCEF1EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.DependencyTracking.MongoDb", "SmartDevelopment.DependencyTracking.MongoDb\SmartDevelopment.DependencyTracking.MongoDb.csproj", "{B74CB135-86FB-41F1-95F1-B6345E1CF1D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.DependencyTracking.MongoDb", "SmartDevelopment.DependencyTracking.MongoDb\SmartDevelopment.DependencyTracking.MongoDb.csproj", "{B74CB135-86FB-41F1-95F1-B6345E1CF1D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Identity", "SmartDevelopment.Identity\SmartDevelopment.Identity.csproj", "{E7B80AE7-90EB-4A94-BB1B-6E2851729102}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.SampleApp.AspCore", "SmartDevelopment.SampleApp.AspCore\SmartDevelopment.SampleApp.AspCore.csproj", "{C21C9898-29C9-424D-A4D5-393B111BCFA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Logging", "SmartDevelopment.Logging\SmartDevelopment.Logging.csproj", "{08955EC8-A79A-4351-8DBC-7AA66E9C3963}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.DependencyTracking.ApplicationInsights", "SmartDevelopment.Profiling\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj", "{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +41,22 @@ Global
 		{B74CB135-86FB-41F1-95F1-B6345E1CF1D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B74CB135-86FB-41F1-95F1-B6345E1CF1D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B74CB135-86FB-41F1-95F1-B6345E1CF1D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7B80AE7-90EB-4A94-BB1B-6E2851729102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7B80AE7-90EB-4A94-BB1B-6E2851729102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7B80AE7-90EB-4A94-BB1B-6E2851729102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7B80AE7-90EB-4A94-BB1B-6E2851729102}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C21C9898-29C9-424D-A4D5-393B111BCFA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C21C9898-29C9-424D-A4D5-393B111BCFA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C21C9898-29C9-424D-A4D5-393B111BCFA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C21C9898-29C9-424D-A4D5-393B111BCFA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08955EC8-A79A-4351-8DBC-7AA66E9C3963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08955EC8-A79A-4351-8DBC-7AA66E9C3963}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08955EC8-A79A-4351-8DBC-7AA66E9C3963}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08955EC8-A79A-4351-8DBC-7AA66E9C3963}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
