@@ -64,7 +64,7 @@ namespace SmartDevelopment.Identity.Stores
 
         public async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
         {
-            await _dal.InsertAsync(user).ConfigureAwait(false);
+            await _dal.InsertOrUpdateAsync(new List<TUser> { user }).ConfigureAwait(false);
             return IdentityResult.Success;
         }
 

@@ -7,11 +7,11 @@ namespace SmartDevelopment.AzureStorage.Blobs
 {
     public sealed class BlobsInitializator
     {
-        private IList<IFileStorage> _storages { get; }
+        private IEnumerable<IFileStorage> _storages { get; }
 
         private readonly ILogger<BlobsInitializator> _logger;
 
-        public BlobsInitializator(IList<IFileStorage> storages, ILogger<BlobsInitializator> logger)
+        public BlobsInitializator(IEnumerable<IFileStorage> storages, ILogger<BlobsInitializator> logger)
         {
             _storages = storages;
             _logger = logger;
@@ -28,6 +28,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"failed to init blob {store.GetType().FullName}");
+                    throw;
                 }
             }
         }

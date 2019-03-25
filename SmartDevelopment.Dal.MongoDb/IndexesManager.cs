@@ -8,11 +8,11 @@ namespace SmartDevelopment.Dal.MongoDb
 {
     public class IndexesManager
     {
-        private IList<IIndexedSource> IndexedSources { get; }
+        private IEnumerable<IIndexedSource> IndexedSources { get; }
 
         private readonly ILogger<IndexesManager> _logger;
 
-        public IndexesManager(IList<IIndexedSource> indexedSources, ILogger<IndexesManager> logger)
+        public IndexesManager(IEnumerable<IIndexedSource> indexedSources, ILogger<IndexesManager> logger)
         {
             IndexedSources = indexedSources;
             _logger = logger;
@@ -29,6 +29,7 @@ namespace SmartDevelopment.Dal.MongoDb
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"failed to create index for {indexedSource.GetType().FullName}");
+                    throw;
                 }
             }
         }

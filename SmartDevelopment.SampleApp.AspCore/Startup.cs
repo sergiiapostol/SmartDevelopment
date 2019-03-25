@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using SmartDevelopment.AzureStorage.Blobs;
+using SmartDevelopment.AzureStorage.Queues;
 using SmartDevelopment.Dal.MongoDb;
 using SmartDevelopment.DependencyTracking;
 using SmartDevelopment.DependencyTracking.ApplicationInsights;
@@ -40,11 +42,10 @@ namespace SmartDevelopment.SampleApp.AspCore
 
         private IConfigurationRoot Configuration { get; }
 
+        private Logging.ILogger<Startup> ApplicationLogger { get; set; }
 
         private void AddConfiguration(IServiceCollection services)
         {
-            services.Configure<JwtTokenConfiguration>("JwtToken", Configuration);
-
             var jwtTokenOptions = Configuration.GetSection("JwtToken").Get<JwtTokenConfiguration>();
             services.AddOptions<JwtBearerOptions>()
                 .Configure(options =>
@@ -62,6 +63,8 @@ namespace SmartDevelopment.SampleApp.AspCore
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero
                     });
+
+            services.Configure<JwtTokenConfiguration>(Configuration.GetSection("JwtToken"));
 
             services.AddOptions<ConnectionSettings>()
                 .Configure(options =>
@@ -166,18 +169,21 @@ namespace SmartDevelopment.SampleApp.AspCore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseResponseCaching();
-
             app.UseAuthentication();
 
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "api/{controller}/{action}/{id?}");
+            }).UseResponseCaching().UseResponseCompression();
 
             app.UseSwagger();
 
@@ -187,6 +193,27 @@ namespace SmartDevelopment.SampleApp.AspCore
                 c.EnableValidator();
                 c.DisplayRequestDuration();
                 c.EnableFilter();
+            });
+
+            ApplicationLogger = app.ApplicationServices.GetService<Logging.ILogger<Startup>>();
+
+            appLifetime.ApplicationStopped.Register(() =>
+            {
+                ApplicationLogger.Debug("Application ending");
+            });
+
+            appLifetime.ApplicationStarted.Register(async () =>
+            {
+                ApplicationLogger.Debug("Application starting");
+
+                var indexManager = app.ApplicationServices.GetService<IndexesManager>();
+                await indexManager.UpdateIndexes().ConfigureAwait(false);
+
+                var blobs = app.ApplicationServices.GetService<BlobsInitializator>();
+                await blobs.Init().ConfigureAwait(false);
+
+                var queues = app.ApplicationServices.GetService<QueuesInitializator>();
+                await queues.Init().ConfigureAwait(false);
             });
         }
     }

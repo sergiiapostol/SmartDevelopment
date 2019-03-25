@@ -8,6 +8,7 @@ namespace SmartDevelopment.Dal.MongoDb
         {
             services.AddSingleton<IMongoClientFactory, MongoClientFactory>();
             services.AddSingleton<IMongoDatabaseFactory, MongoDatabaseFactory>();
+            services.AddSingleton<IndexesManager>();
 
             return services;
         }

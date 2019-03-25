@@ -7,11 +7,11 @@ namespace SmartDevelopment.AzureStorage.Queues
 {
     public class QueuesInitializator
     {
-        private IList<IQueue> _queues { get; }
+        private IEnumerable<IQueue> _queues { get; }
 
         private readonly ILogger<QueuesInitializator> _logger;
 
-        public QueuesInitializator(IList<IQueue> queues, ILogger<QueuesInitializator> logger)
+        public QueuesInitializator(IEnumerable<IQueue> queues, ILogger<QueuesInitializator> logger)
         {
             _queues = queues;
             _logger = logger;

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using SmartDevelopment.SampleApp.AspCore.Configuration;
 using SmartDevelopment.SampleApp.AspCore.Models;
 using IdentityUser = SmartDevelopment.Identity.Entities.IdentityUser;
@@ -43,6 +44,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
 
             var user = new IdentityUser
             {
+                Id = ObjectId.GenerateNewId(),
                 UserName = model.Email,
                 NormalizedUserName = _userManager.NormalizeKey(model.Email),
                 Email = model.Email,

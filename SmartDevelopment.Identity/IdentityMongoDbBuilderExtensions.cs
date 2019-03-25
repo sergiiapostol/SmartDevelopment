@@ -12,6 +12,7 @@ namespace SmartDevelopment.Identity
         {
             services.AddSingleton<IDal<Entities.IdentityRole>, IdentityRoleDal>();
             services.AddSingleton<IDal<Entities.IdentityUser>, IdentityUserDal>();
+            services.AddSingleton<IIndexedSource, IdentityUserDal>();
 
             services.AddSingleton(typeof(IRoleStore<>), typeof(UserStore<>));
 
