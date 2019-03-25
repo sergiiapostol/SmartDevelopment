@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SmartDevelopment.AzureStorage\SmartDevelopment.AzureStorage.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Dal.MongoDb\SmartDevelopment.Dal.MongoDb.csproj" />
     <ProjectReference Include="..\SmartDevelopment.DependencyTracking.MongoDb\SmartDevelopment.DependencyTracking.MongoDb.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Identity\SmartDevelopment.Identity.csproj" />

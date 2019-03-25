@@ -11,13 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.Dependency
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.DependencyTracking.MongoDb", "SmartDevelopment.DependencyTracking.MongoDb\SmartDevelopment.DependencyTracking.MongoDb.csproj", "{B74CB135-86FB-41F1-95F1-B6345E1CF1D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Identity", "SmartDevelopment.Identity\SmartDevelopment.Identity.csproj", "{E7B80AE7-90EB-4A94-BB1B-6E2851729102}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.Identity", "SmartDevelopment.Identity\SmartDevelopment.Identity.csproj", "{E7B80AE7-90EB-4A94-BB1B-6E2851729102}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.SampleApp.AspCore", "SmartDevelopment.SampleApp.AspCore\SmartDevelopment.SampleApp.AspCore.csproj", "{C21C9898-29C9-424D-A4D5-393B111BCFA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.SampleApp.AspCore", "SmartDevelopment.SampleApp.AspCore\SmartDevelopment.SampleApp.AspCore.csproj", "{C21C9898-29C9-424D-A4D5-393B111BCFA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Logging", "SmartDevelopment.Logging\SmartDevelopment.Logging.csproj", "{08955EC8-A79A-4351-8DBC-7AA66E9C3963}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.Logging", "SmartDevelopment.Logging\SmartDevelopment.Logging.csproj", "{08955EC8-A79A-4351-8DBC-7AA66E9C3963}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.DependencyTracking.ApplicationInsights", "SmartDevelopment.Profiling\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj", "{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.DependencyTracking.ApplicationInsights", "SmartDevelopment.Profiling\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj", "{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.AzureStorage", "SmartDevelopment.AzureStorage\SmartDevelopment.AzureStorage.csproj", "{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

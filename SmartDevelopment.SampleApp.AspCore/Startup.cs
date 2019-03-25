@@ -66,6 +66,9 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.AddOptions<ConnectionSettings>()
                 .Configure(options =>
                     options.ConnectionString = Configuration.GetConnectionString("MongoDb"));
+            services.AddOptions<AzureStorage.ConnectionSettings>()
+                .Configure(options =>
+                    options.ConnectionString = Configuration.GetConnectionString("AzureStorage"));
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -157,6 +160,9 @@ namespace SmartDevelopment.SampleApp.AspCore
                 .AddDefaultTokenProviders();
 
             services.AddSingleton<JwtSecurityTokenHandler>();
+
+            services.AddBlobsInitializer();
+            services.AddQueuesInitializer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
