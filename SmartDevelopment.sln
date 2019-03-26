@@ -19,7 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.Logging", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.DependencyTracking.ApplicationInsights", "SmartDevelopment.Profiling\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj", "{E511AC0C-2B37-4335-A1BA-61ED8C9AED92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.AzureStorage", "SmartDevelopment.AzureStorage\SmartDevelopment.AzureStorage.csproj", "{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.AzureStorage", "SmartDevelopment.AzureStorage\SmartDevelopment.AzureStorage.csproj", "{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Emailer.Abstract", "SmartDevelopment.Emailer.Abstract\SmartDevelopment.Emailer.Abstract.csproj", "{A930F046-0D63-4B64-B788-FF1E046D6FD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Emailer.Sender", "SmartDevelopment.Emailer.Sender\SmartDevelopment.Emailer.Sender.csproj", "{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +67,14 @@ Global
 		{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F09E3C1F-43D3-44BB-9F18-B548AFB8B20E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A930F046-0D63-4B64-B788-FF1E046D6FD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A930F046-0D63-4B64-B788-FF1E046D6FD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A930F046-0D63-4B64-B788-FF1E046D6FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A930F046-0D63-4B64-B788-FF1E046D6FD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

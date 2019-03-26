@@ -37,8 +37,14 @@ namespace SmartDevelopment.Dal.MongoDb
         {
             var collectionName = typeof(TEntity).Name;
 
+            return GetCollection<TEntity>(collectionName);
+        }
+
+        protected IMongoCollection<TEntity2> GetCollection<TEntity2>(string collectionName)
+            where TEntity2 : IDbEntity
+        {
             var db = DatabaseFactory.Get();
-            return db.GetCollection<TEntity>(collectionName);
+            return db.GetCollection<TEntity2>(collectionName);
         }
 
         public virtual void Dispose()

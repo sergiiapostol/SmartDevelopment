@@ -9,6 +9,8 @@ namespace SmartDevelopment.Dal.MongoDb
         public static IServiceCollection AddBlobsInitializer(this IServiceCollection services)
         {
             services.AddSingleton<BlobsInitializator>();
+            services.AddSingleton<BlobTransfer>();
+            services.AddSingleton<IContentTypeResolver, ContentTypeResolver>();
 
             return services;
         }

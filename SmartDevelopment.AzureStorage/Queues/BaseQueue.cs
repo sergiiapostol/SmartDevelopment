@@ -14,6 +14,8 @@ namespace SmartDevelopment.AzureStorage.Queues
 
     public interface IQueue<TMessage> : IQueue where TMessage : class
     {
+        string QueueName { get; }
+
         Task Add(TMessage message, TimeSpan? initialDelay = null);
 
         Task<QueueMessage<TMessage>> Get();
@@ -26,14 +28,15 @@ namespace SmartDevelopment.AzureStorage.Queues
     {
         protected readonly CloudQueue Queue;
 
-        protected BaseQueue(IOptions<ConnectionSettings> connectionSettings)
+        protected BaseQueue(IOptions<ConnectionSettings> connectionSettings, string queueName)
         {
+            QueueName = queueName;
             var account = CloudStorageAccount.Parse(connectionSettings.Value.ConnectionString);
             var client = account.CreateCloudQueueClient();
-            Queue = client.GetQueueReference(_QueueName.ToLower());
+            Queue = client.GetQueueReference(QueueName.ToLower());
         }
 
-        protected abstract string _QueueName { get; }
+        public string QueueName { get; }
 
         public virtual Task Init()
         {
