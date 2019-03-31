@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Emailer.Ab
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Emailer.Sender", "SmartDevelopment.Emailer.Sender\SmartDevelopment.Emailer.Sender.csproj", "{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.HttpClientExtensions", "SmartDevelopment.HttpClientExtensions\SmartDevelopment.HttpClientExtensions.csproj", "{3099A346-9A1C-477F-81E4-0C8D5C025595}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9D41F1D-B17A-423F-AE4B-FB250C55B9CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3099A346-9A1C-477F-81E4-0C8D5C025595}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3099A346-9A1C-477F-81E4-0C8D5C025595}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3099A346-9A1C-477F-81E4-0C8D5C025595}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3099A346-9A1C-477F-81E4-0C8D5C025595}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,8 +14,8 @@ namespace SmartDevelopment.AzureStorage.Blobs
     {
         string ContainerName { get; }
         Task<StorageItem> Save(Stream stream, string fileExtension = null, string contentType = null, IDictionary<string, string> metadata = null);
-        Task<StorageItem> Get(string id);
-        Task Remove(string id);
+        Task<StorageItem> Get(Guid id);
+        Task Remove(Guid id);
         Task Init();
     }
 
@@ -29,11 +29,11 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
         protected BaseFileStorage(IOptions<ConnectionSettings> connectionSettings, string containerName, IEnumerable<IContentTypeResolver> contentTypeMappers)
         {
-             var account = CloudStorageAccount.Parse(connectionSettings.Value.ConnectionString);
+            ContainerName = containerName.ToLower();
+            var account = CloudStorageAccount.Parse(connectionSettings.Value.ConnectionString);
             var client = account.CreateCloudBlobClient();
-            Container = client.GetContainerReference(containerName);
+            Container = client.GetContainerReference(ContainerName);
             _contentTypeMappers = contentTypeMappers;
-            ContainerName = containerName;
         }
 
         public virtual Task Init()
@@ -41,19 +41,19 @@ namespace SmartDevelopment.AzureStorage.Blobs
             return Container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Blob, new BlobRequestOptions(), new OperationContext());
         }
 
-        public Task Remove(string id)
+        public Task Remove(Guid id)
         {
-            var blob = Container.GetBlockBlobReference(id);
+            var blob = Container.GetBlockBlobReference(id.ToString());
             return blob.DeleteAsync();
         }
 
         public async Task<StorageItem> Save(Stream stream, string fileExtension = null, string contentType = null,
             IDictionary<string, string> metadata = null)
         {
-            var id = Guid.NewGuid().ToString();
+            var id = Guid.NewGuid();
 
             stream.Position = 0;
-            var blob = Container.GetBlockBlobReference(id);
+            var blob = Container.GetBlockBlobReference(id.ToString());
 
             await blob.UploadFromStreamAsync(stream).ConfigureAwait(false);
 
@@ -74,9 +74,9 @@ namespace SmartDevelopment.AzureStorage.Blobs
             return new StorageItem(id, blob.Uri.ToString(), stream, contentType, metadata);
         }
 
-        public async Task<StorageItem> Get(string id)
+        public async Task<StorageItem> Get(Guid id)
         {
-            var blob = Container.GetBlockBlobReference(id);
+            var blob = Container.GetBlockBlobReference(id.ToString());
             if (!await blob.ExistsAsync().ConfigureAwait(false))
             {
                 return null;

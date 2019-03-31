@@ -6,7 +6,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
 {
     public class StorageItem : IDisposable
     {
-        public StorageItem(string id, string uri, Stream stream, string contentType, IDictionary<string, string> metadata)
+        public StorageItem(Guid id, string uri, Stream stream, string contentType, IDictionary<string, string> metadata)
         {
             Id = id;
             Uri = uri;
@@ -15,7 +15,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
             ContentType = contentType;
         }
 
-        public string Id { get; }
+        public Guid Id { get; }
 
         public string Uri { get; }
 

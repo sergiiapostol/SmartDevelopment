@@ -21,6 +21,9 @@ namespace SmartDevelopment.Dal.Abstractions
         Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
             Expression<Func<TEntity, TProperty>> property, TProperty value);
 
+        Task IncrementProperty<TProperty>(Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, TProperty>> property, TProperty value);
+
         Task DeleteAsync(TEntity entity);
         Task DeleteAsync(ObjectId id);
         Task<long> DeleteAsync(Expression<Func<TEntity, bool>> filter);

@@ -14,7 +14,7 @@ namespace SmartDevelopment.Identity
             services.AddSingleton<IDal<Entities.IdentityUser>, IdentityUserDal>();
             services.AddSingleton<IIndexedSource, IdentityUserDal>();
 
-            services.AddSingleton(typeof(IRoleStore<>), typeof(UserStore<>));
+            services.AddSingleton(typeof(IRoleStore<>), typeof(RoleStore<>));
 
             services.AddSingleton(typeof(IUserPasswordStore<>), typeof(UserStore<>));
             services.AddSingleton(typeof(IUserRoleStore<>), typeof(UserStore<>));

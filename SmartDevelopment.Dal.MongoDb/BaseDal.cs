@@ -183,6 +183,11 @@ namespace SmartDevelopment.Dal.MongoDb
             return result.ModifiedCount + (result.UpsertedId != null ? 1 : 0);
         }
 
+        public Task IncrementProperty<TProperty>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TProperty>> property, TProperty value)
+        {
+            return SetAsync(filter, Update.Inc(property, value));
+        }
+
         #endregion
 
         #region Delete

@@ -15,6 +15,7 @@ namespace SmartDevelopment.Identity.Entities
             Claims = new List<IdentityUserClaim>();
             Tokens = new List<IdentityUserToken>();
             Logins = new List<IdentityUserLogin>();
+            Roles = new List<string>();
         }
 
 		public List<string> Roles { get; set; }
@@ -107,5 +108,7 @@ namespace SmartDevelopment.Identity.Entities
         }
 
         public DateTime? ModifiedAt { get; set; }
+
+        public int?  ResetToken { get; set; }
     }
 }
