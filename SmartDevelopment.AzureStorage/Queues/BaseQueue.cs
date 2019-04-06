@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Queue;
+﻿using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;

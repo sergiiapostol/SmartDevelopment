@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace SmartDevelopment.AzureStorage.Blobs
 {
@@ -38,7 +38,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
         public virtual Task Init()
         {
-            return Container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Blob, new BlobRequestOptions(), new OperationContext());
+            return Container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Blob, new BlobRequestOptions(), new   OperationContext());
         }
 
         public Task Remove(Guid id)
@@ -52,7 +52,6 @@ namespace SmartDevelopment.AzureStorage.Blobs
         {
             var id = Guid.NewGuid();
 
-            stream.Position = 0;
             var blob = Container.GetBlockBlobReference(id.ToString());
 
             await blob.UploadFromStreamAsync(stream).ConfigureAwait(false);
@@ -63,7 +62,8 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
             metadata = metadata ?? new Dictionary<string, string>();
             metadata.Add("CreatedAt", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
-            metadata.Add("Extension", fileExtension);
+            if(!string.IsNullOrWhiteSpace(fileExtension))
+                metadata.Add("Extension", fileExtension);
 
             foreach (var data in metadata)
             {

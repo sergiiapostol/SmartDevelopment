@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace SmartDevelopment.Logging
@@ -17,10 +16,10 @@ namespace SmartDevelopment.Logging
 
         private readonly LoggerSettings _loggerSettings;
 
-        public Logger(Microsoft.Extensions.Logging.ILogger<TSource> logger, IOptions<LoggerSettings> settings)
+        public Logger(Microsoft.Extensions.Logging.ILogger<TSource> logger, LoggerSettings settings)
         {
             _logger = logger;
-            _loggerSettings = settings.Value;
+            _loggerSettings = settings;
         }
 
         private static Dictionary<string, string> BuildProperties(Dictionary<string, string> extra = null)
@@ -46,6 +45,11 @@ namespace SmartDevelopment.Logging
             var state = PrepareStateObject(BuildProperties(extra), null);
 
             _logger.Log(LogLevel.Error, _eventId, state, ex, ExceptionMessageGetter);
+        }
+
+        public void Exception(string ex)
+        {
+            _logger.LogError(ex);
         }
 
         public void Trace(string message)

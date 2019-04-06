@@ -7,6 +7,8 @@ namespace SmartDevelopment.Logging
     {
         void Exception(Exception ex);
 
+        void Exception(string error);
+
         void Trace(string message);
 
         void Debug(string message, Dictionary<string, string> extra = null);

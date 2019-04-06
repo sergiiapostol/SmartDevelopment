@@ -1,21 +1,15 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
 using SmartDevelopment.Dal.Abstractions;
-using System;
 
 namespace SmartDevelopment.Identity.Entities
 {
-	public class IdentityRole : Microsoft.AspNetCore.Identity.IdentityRole<ObjectId>, IDbEntity
-	{
-		public IdentityRole()
-		{
-		    Id = ObjectId.GenerateNewId();
-		}
+    public class IdentityRole : IdentityRole<ObjectId>, IDbEntity
+    {
+        public List<IdentityRoleClaim<ObjectId>> Claims { get; set; } = new List<IdentityRoleClaim<ObjectId>>();
 
         public DateTime? ModifiedAt { get; set; }
-
-        public string Serialize()
-	    {
-	        return ToString();
-	    }
     }
 }

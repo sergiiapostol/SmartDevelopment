@@ -94,7 +94,6 @@ namespace SmartDevelopment.SampleApp.AspCore
             });
 
             services.Configure<DependencySettings>("DependencySettings", Configuration);
-            services.Configure<LoggerSettings>("LoggerSettings", Configuration);
             services.Configure<ProfilingSettings>("MongoDbProfilingSettings", Configuration);
         }
 
@@ -150,16 +149,16 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             services.AddResponseCaching();
 
-            services.AddLogger();
+            services.AddLogger(Configuration.GetSection("LoggerSettings").Get<LoggerSettings>());
 
             services.AddDependencyTrackingWithApplicationInsights();
 
             services.AddMongoDb();
             services.AddProfiledMongoDb();
 
-            services.AddMongoDbIdentity()
+            services
                 .AddIdentity<Identity.Entities.IdentityUser, Identity.Entities.IdentityRole>()
-                .AddMongodbStores()
+                .AddMongoDBStores<Identity.Entities.IdentityUser, Identity.Entities.IdentityRole>()
                 .AddDefaultTokenProviders();
 
             services.AddSingleton<JwtSecurityTokenHandler>();

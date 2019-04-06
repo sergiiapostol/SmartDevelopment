@@ -23,6 +23,9 @@ namespace SmartDevelopment.DependencyTracking.ApplicationInsights
                 Type = type,
             };
 
+            if (!string.IsNullOrWhiteSpace(description))
+                dependency.Data = description;
+
             _telemetryClient.TrackDependency(dependency);
         }
     }

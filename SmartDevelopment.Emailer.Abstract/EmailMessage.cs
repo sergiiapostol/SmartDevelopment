@@ -27,6 +27,8 @@ namespace SmartDevelopment.Emailer.Abstract
 
         public string Body { get; set; }
 
+        public string BodyMimeType { get; set; } = "text/plain";
+
         public override string ToString()
         {
             return $"f:{From} t:{To} s:{Subject} tId:{TemplateId}";

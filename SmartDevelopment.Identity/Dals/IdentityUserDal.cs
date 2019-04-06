@@ -7,7 +7,8 @@ using SmartDevelopment.Identity.Entities;
 
 namespace SmartDevelopment.Identity.Dals
 {
-    public class IdentityUserDal : BaseDal<IdentityUser>, IIndexedSource
+    public class IdentityUserDal<TUser> : BaseDal<TUser>, IIndexedSource
+        where TUser : IdentityUser
     {
         public IdentityUserDal(IMongoDatabaseFactory databaseFactory) : base(databaseFactory)
         {
@@ -15,28 +16,42 @@ namespace SmartDevelopment.Identity.Dals
 
         public Task EnsureIndex()
         {
-            return Collection.Indexes.CreateManyAsync(new List<CreateIndexModel<IdentityUser>>
+            return Collection.Indexes.CreateManyAsync(new List<CreateIndexModel<TUser>>
             {
-                new CreateIndexModel<IdentityUser>(
-                    Builders<IdentityUser>.IndexKeys
+                new CreateIndexModel<TUser>(
+                    Builders<TUser>.IndexKeys
                         .Descending(v => v.NormalizedUserName),
-                    new CreateIndexOptions<IdentityUser>
+                    new CreateIndexOptions<TUser>
                     {
-                        Unique = true,
-                        Background = true
+                        Background = true, Unique = true
                     }),
-                new CreateIndexModel<IdentityUser>(
-                    Builders<IdentityUser>.IndexKeys
+                new CreateIndexModel<TUser>(
+                    Builders<TUser>.IndexKeys
                         .Descending(v => v.NormalizedEmail),
-                    new CreateIndexOptions<IdentityUser>
+                    new CreateIndexOptions<TUser>
                     {
-                        Background = true
+                        Background = true, Sparse = true
                     }),
-                new CreateIndexModel<IdentityUser>(
-                    Builders<IdentityUser>.IndexKeys
+                new CreateIndexModel<TUser>(
+                    Builders<TUser>.IndexKeys
                         .Descending("Logins.LoginProvider")
                         .Descending("Logins.ProviderKey"),
-                    new CreateIndexOptions<IdentityUser>
+                    new CreateIndexOptions<TUser>
+                    {
+                        Background = true, Unique = true, Sparse = true
+                    }),
+                new CreateIndexModel<TUser>(
+                    Builders<TUser>.IndexKeys
+                        .Descending("Claims.ClaimValue")
+                        .Descending("Claims.ClaimType"),
+                    new CreateIndexOptions<TUser>
+                    {
+                        Background = true
+                    }),
+                new CreateIndexModel<TUser>(
+                    Builders<TUser>.IndexKeys
+                        .Descending(v => v.Roles),
+                    new CreateIndexOptions<TUser>
                     {
                         Background = true
                     })

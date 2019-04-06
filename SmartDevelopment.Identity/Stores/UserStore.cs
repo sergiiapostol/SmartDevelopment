@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -8,325 +7,240 @@ using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using SmartDevelopment.Dal.Abstractions;
 using SmartDevelopment.Dal.Abstractions.Models;
+using IdentityRole = SmartDevelopment.Identity.Entities.IdentityRole;
+using IdentityUser = SmartDevelopment.Identity.Entities.IdentityUser;
 
 namespace SmartDevelopment.Identity.Stores
 {
-	public class UserStore<TUser> :
-			IUserPasswordStore<TUser>,
-			IUserRoleStore<TUser>,
-			IUserLoginStore<TUser>,
-			IUserSecurityStampStore<TUser>,
-			IUserEmailStore<TUser>,
-			IUserClaimStore<TUser>,
-			IUserPhoneNumberStore<TUser>,
-			IUserTwoFactorStore<TUser>,
-			IUserLockoutStore<TUser>,
-			IUserAuthenticationTokenStore<TUser>
-		where TUser : Entities.IdentityUser
-	{
+    public class UserStore<TUser, TRole, TUserClaim, TUserRole, TUserLogin, TUserToken, TRoleClaim> :
+        UserStoreBase<TUser, TRole, ObjectId, TUserClaim, TUserRole, TUserLogin, TUserToken, TRoleClaim>
+        where TUser : IdentityUser
+        where TRole : IdentityRole
+        where TUserClaim : IdentityUserClaim<ObjectId>, new()
+        where TUserRole : IdentityUserRole<ObjectId>, new()
+        where TUserLogin : IdentityUserLogin<ObjectId>, new()
+        where TUserToken : IdentityUserToken<ObjectId>, new()
+        where TRoleClaim : IdentityRoleClaim<ObjectId>, new()
+
+    {
 	    private readonly IDal<TUser> _dal;
 
-	    public UserStore(IDal<TUser> dal)
+        private readonly IDal<TRole> _rolesDal;
+
+        public override IQueryable<TUser> Users => _dal.AsQueryable();
+
+        public UserStore(IDal<TUser> dal, IDal<TRole> rolesDal, IdentityErrorDescriber describer) :
+            base(describer)
 	    {
 	        _dal = dal;
-	    }
-
-	    public void Dispose()
-        {
+            _rolesDal = rolesDal;
         }
 
-        public Task<string> GetUserIdAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.Id.ToString());
-        }
-
-        public Task<string> GetUserNameAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.UserName);
-        }
-
-        public Task SetUserNameAsync(TUser user, string userName, CancellationToken cancellationToken)
-        {
-            user.UserName = userName;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task<string> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.NormalizedUserName);
-        }
-
-        public Task SetNormalizedUserNameAsync(TUser user, string normalizedName, CancellationToken cancellationToken)
-        {
-            user.NormalizedUserName = normalizedName;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken)
+        public override async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             await _dal.InsertOrUpdateAsync(new List<TUser> { user }).ConfigureAwait(false);
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
+        public override async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await _dal.InsertOrUpdateAsync(new List<TUser>{ user }).ConfigureAwait(false);
+            await _dal.UpdateAsync(new List<TUser> { user }).ConfigureAwait(false);
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken)
+        public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             await _dal.DeleteAsync(user).ConfigureAwait(false);
             return IdentityResult.Success;
         }
 
-        public Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public override Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _dal.GetAsync(ObjectId.Parse(userId));
+            var id = ConvertIdFromString(userId);
+            return _dal.GetAsync(id);
         }
 
-        public async Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public override async Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (await _dal.GetAsync(PagingInfo.OneItem, v => v.NormalizedUserName.Equals(normalizedUserName)).ConfigureAwait(false)).FirstOrDefault();
+            var users = await _dal.GetAsync(PagingInfo.OneItem, v => v.NormalizedUserName.Equals(normalizedUserName)).ConfigureAwait(false);
+            return users.FirstOrDefault();
         }
 
-        public Task SetPasswordHashAsync(TUser user, string passwordHash, CancellationToken cancellationToken)
+        protected override Task<TUser> FindUserAsync(ObjectId userId, CancellationToken cancellationToken)
         {
-            user.PasswordHash = passwordHash;
-            return UpdateAsync(user, cancellationToken);
+            return _dal.GetAsync(userId);
         }
 
-        public Task<string> GetPasswordHashAsync(TUser user, CancellationToken cancellationToken)
+        protected override async Task<TUserLogin> FindUserLoginAsync(ObjectId userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return Task.FromResult(user.PasswordHash);
+            var user = await _dal.GetAsync(userId).ConfigureAwait(false);
+
+            return (TUserLogin)user?.Logins.Find(l =>
+                    l.LoginProvider == loginProvider
+                    && l.ProviderKey == providerKey);
         }
 
-        public Task<bool> HasPasswordAsync(TUser user, CancellationToken cancellationToken)
+        protected override async Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return Task.FromResult(!string.IsNullOrEmpty(user.PasswordHash));
+            var user = await _dal.GetAsync(new PagingInfo(0, 2), v =>
+                v.Logins.Any(l =>
+                    l.LoginProvider == loginProvider
+                    && l.ProviderKey == providerKey)).ConfigureAwait(false);
+
+            return (TUserLogin)user.SingleOrDefault()?.Logins.Find(l =>
+                    l.LoginProvider == loginProvider
+                    && l.ProviderKey == providerKey);
         }
 
-        public Task AddToRoleAsync(TUser user, string roleName, CancellationToken cancellationToken)
+        public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            user.AddRole(roleName);
-            return UpdateAsync(user, cancellationToken);
+            return Task.FromResult((IList<Claim>)user.Claims.Select(c => c.ToClaim()).ToList());
         }
 
-        public Task RemoveFromRoleAsync(TUser user, string roleName, CancellationToken cancellationToken)
+        public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default(CancellationToken))
         {
-            user.RemoveRole(roleName);
-            return UpdateAsync(user, cancellationToken);
+            foreach (var claim in claims)
+            {
+                user.Claims.Add(CreateUserClaim(user, claim));
+            }
+            return Task.CompletedTask;
         }
 
-        public Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken)
+        public override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var matchedClaims = user.Claims.Where(uc =>
+                uc.ClaimValue == claim.Value
+                && uc.ClaimType == claim.Type).ToList();
+
+            foreach (var matchedClaim in matchedClaims)
+            {
+                matchedClaim.ClaimValue = newClaim.Value;
+                matchedClaim.ClaimType = newClaim.Type;
+            }
+            return Task.CompletedTask;
+        }
+
+        public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            foreach (var claim in claims)
+            {
+                var matchedClaims = user.Claims.Where(uc =>
+                    uc.ClaimValue == claim.Value
+                    && uc.ClaimType == claim.Type).ToList();
+
+                foreach (var c in matchedClaims)
+                {
+                    user.Claims.Remove(c);
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        public override Task AddLoginAsync(TUser user, UserLoginInfo login, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            user.Logins.Add(CreateUserLogin(user, login));
+            return Task.CompletedTask;
+        }
+
+        public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            user.Logins.RemoveAll(v=>v.LoginProvider == loginProvider && v.ProviderKey == providerKey);
+            return Task.CompletedTask;
+        }
+
+        public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.FromResult((IList<UserLoginInfo>)user.Logins
+                .Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.ProviderDisplayName)).ToList());
+        }
+
+        public override async Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var users = await _dal.GetAsync(PagingInfo.OneItem, u => u.NormalizedEmail == normalizedEmail).ConfigureAwait(false);
+            return users.FirstOrDefault();
+        }
+
+        public override async Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await _dal.GetAsync(null, v => v.Claims.Any(userclaims => userclaims.ClaimValue == claim.Value
+                          && userclaims.ClaimType == claim.Type)).ConfigureAwait(false);
+        }
+
+        protected override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        {
+            return Task.FromResult((TUserToken)user.Tokens.Find(v=>v.LoginProvider == loginProvider && v.Name == name));
+        }
+
+        protected override async Task AddUserTokenAsync(TUserToken token)
+        {
+            var user = await _dal.GetAsync(token.UserId).ConfigureAwait(false);
+            user.Tokens.Add(token);
+            await UpdateAsync(user).ConfigureAwait(false);
+        }
+
+        protected override async Task RemoveUserTokenAsync(TUserToken token)
+        {
+            var user = await _dal.GetAsync(token.UserId).ConfigureAwait(false);
+            user.Tokens.Remove(token);
+            await UpdateAsync(user).ConfigureAwait(false);
+        }
+
+        public override async Task<IList<TUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await _dal.GetAsync(null, v => v.Roles.Contains(normalizedRoleName)).ConfigureAwait(false);
+        }
+
+        public override Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!user.Roles.Contains(normalizedRoleName))
+                user.Roles.Add(normalizedRoleName);
+
+            return Task.CompletedTask;
+        }
+
+        public override Task RemoveFromRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!user.Roles.Contains(normalizedRoleName))
+                user.Roles.Remove(normalizedRoleName);
+
+            return Task.CompletedTask;
+        }
+
+        public override Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Task.FromResult((IList<string>)user.Roles);
         }
 
-        public Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken)
+        public override Task<bool> IsInRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Task.FromResult(user.Roles?.Contains(roleName) ?? false);
+            return Task.FromResult(user.Roles.Contains(normalizedRoleName));
         }
 
-        public async Task<IList<TUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        protected override async Task<TRole> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
-           return await _dal.GetAsync(null, v => v.Roles.Contains(roleName)).ConfigureAwait(false);
+            var roles = await _rolesDal.GetAsync(new PagingInfo(0, 2), v => v.NormalizedName == normalizedRoleName).ConfigureAwait(false);
+            return roles.SingleOrDefault();
         }
 
-        public Task AddLoginAsync(TUser user, UserLoginInfo login, CancellationToken cancellationToken)
+        protected override async Task<TUserRole> FindUserRoleAsync(ObjectId userId, ObjectId roleId, CancellationToken cancellationToken)
         {
-            user.AddLogin(login);
-            return UpdateAsync(user, cancellationToken);
+            var role = _rolesDal.GetAsync(userId);
+            var user = _dal.GetAsync(userId);
+
+            await Task.WhenAll(role, user).ConfigureAwait(false);
+
+            if (role.Result != null && user.Result != null)
+                return new TUserRole { RoleId = roleId, UserId = userId };
+
+            return null;
         }
 
-        public Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
+        public override ObjectId ConvertIdFromString(string id)
         {
-            user.RemoveLogin(loginProvider, providerKey);
-            return UpdateAsync(user, cancellationToken);
-        }
+            if (ObjectId.TryParse(id, out ObjectId oId))
+                return oId;
 
-        public Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult((IList<UserLoginInfo>)user.Logins?.Select(v=>v.ToUserLoginInfo()).ToList());
-        }
-
-        public async Task<TUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
-        {
-            return (await _dal.GetAsync(PagingInfo.OneItem,
-                    v => v.Logins.Any(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey)).ConfigureAwait(false))
-                .FirstOrDefault();
-        }
-
-        public Task SetSecurityStampAsync(TUser user, string stamp, CancellationToken cancellationToken)
-        {
-            user.SecurityStamp = stamp;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task<string> GetSecurityStampAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.SecurityStamp);
-        }
-
-        public Task SetEmailAsync(TUser user, string email, CancellationToken cancellationToken)
-        {
-            user.Email = email;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task<string> GetEmailAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.Email);
-        }
-
-        public Task<bool> GetEmailConfirmedAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.EmailConfirmed);
-        }
-
-        public Task SetEmailConfirmedAsync(TUser user, bool confirmed, CancellationToken cancellationToken)
-        {
-            user.EmailConfirmed = confirmed;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public async Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
-        {
-            return (await _dal.GetAsync(PagingInfo.OneItem,
-                    v => v.NormalizedEmail == normalizedEmail).ConfigureAwait(false))
-                .FirstOrDefault();
-        }
-
-        public Task<string> GetNormalizedEmailAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.NormalizedEmail);
-        }
-
-        public Task SetNormalizedEmailAsync(TUser user, string normalizedEmail, CancellationToken cancellationToken)
-        {
-            user.NormalizedEmail = normalizedEmail;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult((IList<Claim>)user.Claims.Select(v=>v.ToSecurityClaim()).ToList());
-        }
-
-        public Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
-        {
-            foreach (var claim in claims)
-            {
-                user.AddClaim(claim);
-            }
-            return UpdateAsync(user, cancellationToken);
-        }
-
-	    public Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
-	    {
-	        user.ReplaceClaim(claim, newClaim);
-	        return UpdateAsync(user, cancellationToken);
-	    }
-
-	    public Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
-        {
-            foreach (var claim in claims)
-            {
-                user.RemoveClaim(claim);
-            }
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public async Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
-        {
-            return await _dal.GetAsync(null, v => v.Claims.Any(c => c.Type == claim.Type && c.Value == claim.Value)).ConfigureAwait(false);
-        }
-
-        public Task SetPhoneNumberAsync(TUser user, string phoneNumber, CancellationToken cancellationToken)
-        {
-            user.PhoneNumber = phoneNumber;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task<string> GetPhoneNumberAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.PhoneNumber);
-        }
-
-        public Task<bool> GetPhoneNumberConfirmedAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.PhoneNumberConfirmed);
-        }
-
-        public Task SetPhoneNumberConfirmedAsync(TUser user, bool confirmed, CancellationToken cancellationToken)
-        {
-            user.PhoneNumberConfirmed = confirmed;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task SetTwoFactorEnabledAsync(TUser user, bool enabled, CancellationToken cancellationToken)
-        {
-            user.TwoFactorEnabled = enabled;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task<bool> GetTwoFactorEnabledAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.TwoFactorEnabled);
-        }
-
-        public Task<DateTimeOffset?> GetLockoutEndDateAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.LockoutEnd);
-        }
-
-        public Task SetLockoutEndDateAsync(TUser user, DateTimeOffset? lockoutEnd, CancellationToken cancellationToken)
-        {
-            user.LockoutEnd = lockoutEnd;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public async Task<int> IncrementAccessFailedCountAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return (int)await _dal.SetAsync(v => v.Id == user.Id, v => v.AccessFailedCount, user.AccessFailedCount+1).ConfigureAwait(false);
-        }
-
-        public Task ResetAccessFailedCountAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return _dal.SetAsync(v => v.Id == user.Id, v => v.AccessFailedCount, 0);
-        }
-
-        public Task<int> GetAccessFailedCountAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.AccessFailedCount);
-        }
-
-        public Task<bool> GetLockoutEnabledAsync(TUser user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.LockoutEnabled);
-        }
-
-        public Task SetLockoutEnabledAsync(TUser user, bool enabled, CancellationToken cancellationToken)
-        {
-            user.LockoutEnabled = enabled;
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task SetTokenAsync(TUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
-        {
-            user.SetToken(loginProvider, name, value);
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task RemoveTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
-        {
-            user.RemoveToken(loginProvider, name);
-            return UpdateAsync(user, cancellationToken);
-        }
-
-        public Task<string> GetTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.GetTokenValue(loginProvider, name));
+            return base.ConvertIdFromString(id);
         }
     }
 }

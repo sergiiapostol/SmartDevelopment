@@ -1,40 +1,50 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson;
 using SmartDevelopment.Dal.Abstractions;
 using SmartDevelopment.Identity.Dals;
 using SmartDevelopment.Identity.Stores;
+using IdentityUser = SmartDevelopment.Identity.Entities.IdentityUser;
+using IdentityRole = SmartDevelopment.Identity.Entities.IdentityRole;
 
 namespace SmartDevelopment.Identity
 {
     public static class IdentityMongoDbBuilderExtensions
     {
-        public static IServiceCollection AddMongoDbIdentity(this IServiceCollection services)
+        public static IdentityBuilder AddMongoDBStores<TUser, TRole>(this IdentityBuilder builder)
+            where TUser : IdentityUser
+            where TRole : IdentityRole
         {
-            services.AddSingleton<IDal<Entities.IdentityRole>, IdentityRoleDal>();
-            services.AddSingleton<IDal<Entities.IdentityUser>, IdentityUserDal>();
-            services.AddSingleton<IIndexedSource, IdentityUserDal>();
-
-            services.AddSingleton(typeof(IRoleStore<>), typeof(RoleStore<>));
-
-            services.AddSingleton(typeof(IUserPasswordStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserRoleStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserLoginStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserSecurityStampStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserEmailStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserClaimStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserPhoneNumberStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserTwoFactorStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserLockoutStore<>), typeof(UserStore<>));
-            services.AddSingleton(typeof(IUserAuthenticationTokenStore<>), typeof(UserStore<>));
-
-            return services;
+            return builder.AddMongoDBStores<
+                TUser,
+                TRole,
+                IdentityUserClaim<ObjectId>,
+                IdentityUserRole<ObjectId>,
+                IdentityUserLogin<ObjectId>,
+                IdentityUserToken<ObjectId>,
+                IdentityRoleClaim<ObjectId>>();
         }
 
-        public static IdentityBuilder AddMongodbStores(this IdentityBuilder builder)
+        public static IdentityBuilder AddMongoDBStores<TUser, TRole, TUserClaim, TUserRole, TUserLogin, TUserToken, TRoleClaim>(this IdentityBuilder builder)
+            where TUser : IdentityUser
+            where TRole : IdentityRole
+            where TUserClaim : IdentityUserClaim<ObjectId>, new()
+            where TUserRole : IdentityUserRole<ObjectId>, new()
+            where TUserLogin : IdentityUserLogin<ObjectId>, new()
+            where TUserToken : IdentityUserToken<ObjectId>, new()
+            where TRoleClaim : IdentityRoleClaim<ObjectId>, new()
         {
+            var services = builder.Services;
+
+            services.AddSingleton<IDal<TUser>, IdentityUserDal<TUser>>();
+            services.AddSingleton<IIndexedSource, IdentityUserDal<TUser>>();
+
+            services.AddSingleton<IDal<TRole>, IdentityRoleDal<TRole>>();
+            services.AddSingleton<IIndexedSource, IdentityRoleDal<TRole>>();
+
             return builder
-                .AddRoleStore<RoleStore<Entities.IdentityRole>>()
-                .AddUserStore<UserStore<Entities.IdentityUser>>();
+                .AddUserStore<UserStore<TUser, TRole, TUserClaim, TUserRole, TUserLogin, TUserToken, TRoleClaim>>()
+                .AddRoleStore<RoleStore<TRole, TUserRole, TRoleClaim>>();
         }
     }
 }
