@@ -61,9 +61,9 @@ namespace SmartDevelopment.AzureStorage.Blobs
             await blob.SetPropertiesAsync().ConfigureAwait(false);
 
             metadata = metadata ?? new Dictionary<string, string>();
-            metadata.Add("CreatedAt", DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
+            metadata["CreatedAt"] = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
             if(!string.IsNullOrWhiteSpace(fileExtension))
-                metadata.Add("Extension", fileExtension);
+                metadata["Extension"] = fileExtension;
 
             foreach (var data in metadata)
             {
