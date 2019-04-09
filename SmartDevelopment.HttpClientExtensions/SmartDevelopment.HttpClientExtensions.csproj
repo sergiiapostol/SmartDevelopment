@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Configurations>Debug;Release;Staging</Configurations>
+    <Authors>SmartDevelopment</Authors>
+    <PackageProjectUrl />
+    <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

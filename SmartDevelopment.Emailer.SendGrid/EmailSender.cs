@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using SmartDevelopment.Emailer.Abstract;
-using SmartDevelopment.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -29,18 +29,18 @@ namespace SmartDevelopment.Emailer.SendGrid
             }
             catch (Exception ex)
             {
-                _logger.Exception(ex);
+                _logger.LogError(ex, $"Failed to build email object");
                 return;
             }
 
             try
             {
                 var response = await _sendGridClient.SendEmailAsync(emailRequest).ConfigureAwait(false);
-                _logger.Debug($"SendGrid response {response.StatusCode}");
+                _logger.LogDebug($"SendGrid response {response.StatusCode}");
             }
             catch (Exception ex)
             {
-                _logger.Exception(ex);
+                _logger.LogError(ex, $"Failed to send email");
                 throw;
             }
         }

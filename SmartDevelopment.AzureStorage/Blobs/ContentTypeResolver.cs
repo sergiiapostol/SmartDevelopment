@@ -1,4 +1,4 @@
-﻿using SmartDevelopment.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
 namespace SmartDevelopment.AzureStorage.Blobs
@@ -705,7 +705,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
             if (_contentTypes.TryGetValue(fileExtension.ToLower(), out string contentType))
                 return contentType;
 
-            _logger.Warning($"Unknown contentType for {fileExtension}");
+            _logger.LogWarning($"Unknown contentType for {fileExtension}");
             return string.Empty;
         }
     }

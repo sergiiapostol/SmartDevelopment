@@ -1,6 +1,5 @@
 ﻿using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
@@ -28,10 +27,10 @@ namespace SmartDevelopment.AzureStorage.Queues
     {
         protected readonly CloudQueue Queue;
 
-        protected BaseQueue(IOptions<ConnectionSettings> connectionSettings, string queueName)
+        protected BaseQueue(ConnectionSettings connectionSettings, string queueName)
         {
             QueueName = queueName;
-            var account = CloudStorageAccount.Parse(connectionSettings.Value.ConnectionString);
+            var account = CloudStorageAccount.Parse(connectionSettings.ConnectionString);
             var client = account.CreateCloudQueueClient();
             Queue = client.GetQueueReference(QueueName.ToLower());
         }

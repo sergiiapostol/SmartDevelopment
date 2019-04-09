@@ -5,10 +5,10 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
 {
     public static class ProfiledMongoDbDalServicesExtensions
     {
-        public static IServiceCollection AddProfiledMongoDb(this IServiceCollection services)
+        public static IServiceCollection AddProfiledMongoDb(this IServiceCollection services, ConnectionSettings connectionSettings, ProfilingSettings profilingSettings)
         {
-            services.AddSingleton<DependencyProfiler>();
-
+            services.AddMongoDb(connectionSettings);
+            services.AddSingleton(profilingSettings);
             services.Remove(new ServiceDescriptor(typeof(IMongoClientFactory), typeof(MongoClientFactory), ServiceLifetime.Singleton));
             services.AddSingleton<IMongoClientFactory, ProfiledMongoClientFactory>();
 

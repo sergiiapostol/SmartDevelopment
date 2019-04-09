@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using SmartDevelopment.Dal.MongoDb;
 using System.Linq;
 
@@ -9,10 +8,10 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
     {
         private readonly ProfiledMongoClientSettings _configurator;
 
-        public ProfiledMongoClientFactory(DependencyProfiler dependencyProfiler, IOptions<ProfilingSettings> profilingSettings)
+        public ProfiledMongoClientFactory(DependencyProfiler dependencyProfiler, ProfilingSettings profilingSettings)
         {
-            _configurator = new ProfiledMongoClientSettings(dependencyProfiler, profilingSettings.Value.DependencyName,
-                profilingSettings.Value.IgnoredCommands ?? Enumerable.Empty<string>());
+            _configurator = new ProfiledMongoClientSettings(dependencyProfiler, profilingSettings.DependencyName,
+                profilingSettings.IgnoredCommands ?? Enumerable.Empty<string>());
         }
 
         public override MongoClientSettings Get(MongoUrl mongoUrl)

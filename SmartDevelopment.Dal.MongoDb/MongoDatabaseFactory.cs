@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -21,9 +20,9 @@ namespace SmartDevelopment.Dal.MongoDb
 
         private readonly object _lock = new object();
 
-        public MongoDatabaseFactory(IOptions<ConnectionSettings> connectionSettings, IMongoClientFactory clientFactory)
+        public MongoDatabaseFactory(ConnectionSettings connectionSettings, IMongoClientFactory clientFactory)
         {
-            _connectionSettings = connectionSettings.Value;
+            _connectionSettings = connectionSettings;
             _clientFactory = clientFactory;
             BsonSerializer.RegisterSerializer(typeof(decimal), new DecimalSerializer(BsonType.Decimal128));
             BsonSerializer.RegisterSerializer(typeof(decimal?), new NullableSerializer<decimal>(new DecimalSerializer(BsonType.Decimal128)));

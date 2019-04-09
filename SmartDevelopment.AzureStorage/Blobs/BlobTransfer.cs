@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using SmartDevelopment.Logging;
 
 namespace SmartDevelopment.AzureStorage.Blobs
 {
@@ -29,7 +29,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
             }
             catch (Exception ex)
             {
-                _logger.Exception(ex);
+                _logger.LogError(ex, $"Failed to move file {fileId} from {from.ContainerName} to {to.ContainerName}");
             }
 
             return newFile;

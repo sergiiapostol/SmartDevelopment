@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
-using Microsoft.Extensions.Options;
 
 namespace SmartDevelopment.AzureStorage.Blobs
 {
@@ -27,10 +26,10 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
         public string ContainerName { get; }
 
-        protected BaseFileStorage(IOptions<ConnectionSettings> connectionSettings, string containerName, IEnumerable<IContentTypeResolver> contentTypeMappers)
+        protected BaseFileStorage(ConnectionSettings connectionSettings, string containerName, IEnumerable<IContentTypeResolver> contentTypeMappers)
         {
             ContainerName = containerName.ToLower();
-            var account = CloudStorageAccount.Parse(connectionSettings.Value.ConnectionString);
+            var account = CloudStorageAccount.Parse(connectionSettings.ConnectionString);
             var client = account.CreateCloudBlobClient();
             Container = client.GetContainerReference(ContainerName);
             _contentTypeMappers = contentTypeMappers;
@@ -58,6 +57,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
             blob.Properties.ContentType = contentType ??
                 _contentTypeMappers?.Select(v => v.GetContentType(fileExtension)).FirstOrDefault(v => !string.IsNullOrEmpty(v));
+            blob.Properties.ContentDisposition = $"attachment; filename=\"{ id}{fileExtension}\"";
             await blob.SetPropertiesAsync().ConfigureAwait(false);
 
             metadata = metadata ?? new Dictionary<string, string>();

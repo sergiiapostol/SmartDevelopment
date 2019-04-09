@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using SmartDevelopment.AzureStorage;
 using SmartDevelopment.AzureStorage.Blobs;
 using SmartDevelopment.AzureStorage.Queues;
 using SmartDevelopment.Dal.MongoDb;
@@ -66,13 +67,6 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             services.Configure<JwtTokenConfiguration>(Configuration.GetSection("JwtToken"));
 
-            services.AddOptions<ConnectionSettings>()
-                .Configure(options =>
-                    options.ConnectionString = Configuration.GetConnectionString("MongoDb"));
-            services.AddOptions<AzureStorage.ConnectionSettings>()
-                .Configure(options =>
-                    options.ConnectionString = Configuration.GetConnectionString("AzureStorage"));
-
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings
@@ -92,9 +86,6 @@ namespace SmartDevelopment.SampleApp.AspCore
                 options.SignIn.RequireConfirmedEmail = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             });
-
-            services.Configure<DependencySettings>("DependencySettings", Configuration);
-            services.Configure<ProfilingSettings>("MongoDbProfilingSettings", Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -151,10 +142,11 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             services.AddLogger(Configuration.GetSection("LoggerSettings").Get<LoggerSettings>());
 
-            services.AddDependencyTrackingWithApplicationInsights();
+            services.AddDependencyTrackingWithApplicationInsights(Configuration.GetSection("DependencySettings").Get<DependencySettings>());
 
-            services.AddMongoDb();
-            services.AddProfiledMongoDb();
+            services.AddProfiledMongoDb(
+                new Dal.MongoDb.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("MongoDb") }, 
+                Configuration.GetSection("MongoDbProfilingSettings").Get<ProfilingSettings>());
 
             services
                 .AddIdentity<Identity.Entities.IdentityUser, Identity.Entities.IdentityRole>()
@@ -163,8 +155,8 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             services.AddSingleton<JwtSecurityTokenHandler>();
 
-            services.AddBlobsInitializer();
-            services.AddQueuesInitializer();
+            services.AddBlobsInitializer(new AzureStorage.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("AzureStorage") });
+            services.AddQueuesInitializer(new AzureStorage.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("AzureStorage") });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

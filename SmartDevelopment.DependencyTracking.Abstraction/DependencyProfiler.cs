@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Diagnostics;
 
 namespace SmartDevelopment.DependencyTracking
@@ -10,9 +9,9 @@ namespace SmartDevelopment.DependencyTracking
 
         private readonly IDependencyStore _dependencyStore;
 
-        public DependencyProfiler(IOptions<DependencySettings> dependencySettings, IDependencyStore dependencyStore)
+        public DependencyProfiler(DependencySettings dependencySettings, IDependencyStore dependencyStore)
         {
-            _dependencySettings = dependencySettings.Value;
+            _dependencySettings = dependencySettings;
             _dependencyStore = dependencyStore;
         }
 

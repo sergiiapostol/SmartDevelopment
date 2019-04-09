@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>SmartDevelopment</Authors>
+    <Product>SmartDevelopment.Jobs</Product>
+    <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
