@@ -6,6 +6,7 @@
     <Authors>SmartDevelopment</Authors>
     <Product>SmartDevelopment.DependencyTracking</Product>
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
