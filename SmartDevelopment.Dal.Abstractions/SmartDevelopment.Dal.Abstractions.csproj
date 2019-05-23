@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <NeutralLanguage />
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

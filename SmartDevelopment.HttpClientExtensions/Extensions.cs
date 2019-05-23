@@ -9,7 +9,7 @@ namespace SmartDevelopment.HttpClientExtensions
 {
     public static class Extensions
     {
-        private static async Task<TResult> SendAsync<TModel, TResult>(HttpClient client, string url, TModel model, HttpMethod method, string authToken = null)
+        private static async Task<TResult> SendAsync<TModel, TResult>(HttpClient client, string url, TModel model, HttpMethod method, string authToken, JsonSerializer jsonSerializer = null)
              where TModel : class
             where TResult : class
         {
@@ -31,46 +31,48 @@ namespace SmartDevelopment.HttpClientExtensions
 
             using (var response = await client.SendAsync(request).ConfigureAwait(false))
             {
-                return await Deserialize<TResult>(response).ConfigureAwait(false);
+                return await Deserialize<TResult>(response, jsonSerializer).ConfigureAwait(false);
             }
         }
 
-        public static Task<TResult> PatchAsync<TModel, TResult>(this HttpClient client, string url, TModel model, string authToken = null)
+        public static Task<TResult> PatchAsync<TModel, TResult>(this HttpClient client, string url, TModel model, string authToken = null, JsonSerializer jsonSerializer = null)
             where TModel : class
             where TResult : class
         {
-            return SendAsync<TModel, TResult>(client, url, model, new HttpMethod("PATCH"), authToken);
+            return SendAsync<TModel, TResult>(client, url, model, new HttpMethod("PATCH"), authToken, jsonSerializer);
         }
 
-        public static Task<TResult> PutAsync<TModel, TResult>(this HttpClient client, string url, TModel model, string authToken = null)
+        public static Task<TResult> PutAsync<TModel, TResult>(this HttpClient client, string url, TModel model, string authToken = null, JsonSerializer jsonSerializer = null)
             where TModel : class
             where TResult : class
         {
-            return SendAsync<TModel, TResult>(client, url, model, HttpMethod.Put, authToken);
+            return SendAsync<TModel, TResult>(client, url, model, HttpMethod.Put, authToken, jsonSerializer);
         }
 
-        public static Task<TResult> PostAsync<TModel, TResult>(this HttpClient client, string url, TModel model, string authToken = null)
+        public static Task<TResult> PostAsync<TModel, TResult>(this HttpClient client, string url, TModel model, string authToken = null, JsonSerializer jsonSerializer = null)
             where TModel : class
             where TResult : class
         {
-            return SendAsync<TModel, TResult>(client, url, model, HttpMethod.Post, authToken);
+            return SendAsync<TModel, TResult>(client, url, model, HttpMethod.Post, authToken, jsonSerializer);
         }
 
-        public static Task<TResult> GetAsync<TResult>(this HttpClient client, string url, string authToken = null)
+        public static Task<TResult> GetAsync<TResult>(this HttpClient client, string url, string authToken = null, JsonSerializer jsonSerializer = null)
             where TResult : class
         {
-            return SendAsync<object, TResult>(client, url, null, HttpMethod.Get, authToken);
+            return SendAsync<object, TResult>(client, url, null, HttpMethod.Get, authToken, jsonSerializer);
         }
-
-        public static Task DeleteAsync(this HttpClient client, string url, string authToken = null)
+            
+        public static Task DeleteAsync(this HttpClient client, string url, string authToken = null, JsonSerializer jsonSerializer = null)
         {
-            return SendAsync<object, object>(client, url, null, HttpMethod.Delete, authToken);
+            return SendAsync<object, object>(client, url, null, HttpMethod.Delete, authToken, jsonSerializer);
         }
 
         private static readonly JsonSerializer _serializer = new JsonSerializer();
 
-        private static async Task<TObject> Deserialize<TObject>(HttpResponseMessage response) where TObject : class
+        private static async Task<TObject> Deserialize<TObject>(HttpResponseMessage response, JsonSerializer jsonSerializer = null) where TObject : class
         {
+            jsonSerializer = jsonSerializer ?? _serializer;
+
             await ThrowIfNotSuccess(response).ConfigureAwait(false);
 
             using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
@@ -79,7 +81,7 @@ namespace SmartDevelopment.HttpClientExtensions
             {
                 try
                 {
-                    return _serializer.Deserialize<TObject>(jsonTextReader);
+                    return jsonSerializer.Deserialize<TObject>(jsonTextReader);
                 }
                 catch (Exception ex)
                 {
