@@ -174,6 +174,20 @@ namespace SmartDevelopment.Dal.MongoDb
             Expression<Func<TEntity, TProperty>> property, TProperty value)
         {
             return SetAsync(Filter.Where(filter), Update.Set(property, value).Set(v => v.ModifiedAt, DateTime.UtcNow));
+        }        
+
+        public Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
+            List<PropertyUpdate<TEntity>> updates)
+        {
+            if (updates?.Count < 1)
+                return Task.FromResult(0L);
+
+            var sets = Update.Set(v => v.ModifiedAt, DateTime.UtcNow);
+            foreach(var update in updates)
+            {
+                sets = sets.Set(update.Property, update.Value);
+            }
+            return SetAsync(Filter.Where(filter), sets);
         }
 
         protected async Task<long> SetAsync(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update,

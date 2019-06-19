@@ -9,7 +9,7 @@ using SmartDevelopment.Dal.Abstractions.Models;
 namespace SmartDevelopment.Dal.Abstractions
 {
     public interface IDal<TEntity> : IDalMarker
-        where TEntity : IDbEntity
+        where TEntity : class, IDbEntity
     {
         Task<long> InsertAsync(TEntity entity);
         Task<long> InsertAsync(List<TEntity> entities);
@@ -20,6 +20,9 @@ namespace SmartDevelopment.Dal.Abstractions
 
         Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
             Expression<Func<TEntity, TProperty>> property, TProperty value);
+
+        Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
+            List<PropertyUpdate<TEntity>> updates);
 
         Task<long> IncrementProperty<TProperty>(Expression<Func<TEntity, bool>> filter,
             Expression<Func<TEntity, TProperty>> property, TProperty value);
