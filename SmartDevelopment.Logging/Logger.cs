@@ -34,7 +34,7 @@ namespace SmartDevelopment.Logging
 
         private static Dictionary<string, string> ToDictionary(IDictionary source)
         {
-            return source?.Keys.Cast<string>().ToDictionary(key => key, key => source[key]?.ToString());
+            return source?.Keys.Cast<object>().ToDictionary(key => key.ToString(), key => source[key]?.ToString());
         }
 
         private readonly EventId _eventId = new EventId(1);
