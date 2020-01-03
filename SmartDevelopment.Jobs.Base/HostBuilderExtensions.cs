@@ -41,7 +41,7 @@ namespace SmartDevelopment.Jobs.Base
                 b.AddConsole();
 
                 var appInsightKey = context.Configuration.GetValue<string>(appInsightKeyName);
-                b.AddApplicationInsights(o =>
+                b.AddApplicationInsightsWebJobs(o =>
                 {
                     o.InstrumentationKey = appInsightKey;
                 });

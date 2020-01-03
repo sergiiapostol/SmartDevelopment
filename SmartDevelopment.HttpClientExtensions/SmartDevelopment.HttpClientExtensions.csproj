@@ -1,17 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Configurations>Debug;Release;Staging</Configurations>
-    <Authors>SmartDevelopment</Authors>
-    <PackageProjectUrl />
-    <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.2.0</Version>
+    <Authors>SmartDevelopment</Authors>
+    <Product>SmartDevelopment.Helpers</Product>
+    <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <Version>1.3.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
 </Project>

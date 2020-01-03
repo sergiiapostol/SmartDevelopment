@@ -46,9 +46,9 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
             {
                 Id = ObjectId.GenerateNewId(),
                 UserName = model.Email,
-                NormalizedUserName = _userManager.NormalizeKey(model.Email),
+                NormalizedUserName = _userManager.NormalizeName(model.Email),
                 Email = model.Email,
-                NormalizedEmail = _userManager.NormalizeKey(model.Email)
+                NormalizedEmail = _userManager.NormalizeEmail(model.Email)
             };
             var result = await _userManager.CreateAsync(user).ConfigureAwait(false);
             if (result.Succeeded)

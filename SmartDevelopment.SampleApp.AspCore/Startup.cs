@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,9 +9,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using SmartDevelopment.ApplicationInsight.Extensions;
 using SmartDevelopment.AzureStorage;
 using SmartDevelopment.AzureStorage.Blobs;
 using SmartDevelopment.AzureStorage.Queues;
@@ -27,7 +31,7 @@ namespace SmartDevelopment.SampleApp.AspCore
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
             Environment = env;
 
@@ -39,7 +43,7 @@ namespace SmartDevelopment.SampleApp.AspCore
             Configuration = builder.Build();
         }
 
-        private IHostingEnvironment Environment { get; }
+        private IWebHostEnvironment Environment { get; }
 
         private IConfigurationRoot Configuration { get; }
 
@@ -93,6 +97,12 @@ namespace SmartDevelopment.SampleApp.AspCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging(loggingBuilder => loggingBuilder.AddApplicationInsights());
+            services.AddLogging(loggingBuilder => loggingBuilder.AddApplicationInsights());
+            var aiOptions = Configuration.GetSection("ApplicationInsightsOptions").Get<ApplicationInsightsServiceOptions>() ??
+                new ApplicationInsightsServiceOptions();
+            services.AddApplicationInsightsTelemetry(aiOptions);
+            services.AddApplicationInsightsTelemetryProcessor<RequestsBySynteticSourceFilter>();
+            services.AddApplicationInsightsTelemetryProcessor<RequestsByNameFilter>();
 
             AddConfiguration(services);
 
@@ -109,13 +119,14 @@ namespace SmartDevelopment.SampleApp.AspCore
             // Add framework services.
             services.AddMvc(options =>
             {
+                options.EnableEndpointRouting = false;
                 options.CacheProfiles.Add("Default",
                     new CacheProfile
                     {
                         Duration = 3600,
                         Location = ResponseCacheLocation.Any
                     });
-            }).AddJsonOptions(options =>
+            }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate;
                 options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -124,18 +135,34 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "SmartDevelopment.SampleApp.AspCore API", Version = "v1" });
-                c.DescribeAllEnumsAsStrings();
-                c.DescribeStringEnumsInCamelCase();
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SmartDevelopment.SampleApp.AspCore API", Version = "v1" });
                 c.AddSecurityDefinition("Bearer",
-                    new ApiKeyScheme
+                    new OpenApiSecurityScheme
                     {
-                        In = "header",
+                        In = ParameterLocation.Header,
                         Description = "Please insert JWT with Bearer into field",
                         Name = "Authorization",
-                        Type = "bearer"
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer"
                     });
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> { { "Bearer", new string[] { } } });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                },
+                                Scheme = "oauth2",
+                                Name = "Bearer",
+                                In = ParameterLocation.Header,
+
+                            },
+                            new List<string>()
+                        }
+                    });
             });
 
             services.AddResponseCaching();
@@ -160,7 +187,7 @@ namespace SmartDevelopment.SampleApp.AspCore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime appLifetime)
         {
             if (env.IsDevelopment())
             {

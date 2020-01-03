@@ -1,15 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>SmartDevelopment</Authors>
-    <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Configurations>Debug;Release;Staging</Configurations>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>SmartDevelopment</Authors>
+    <Product>SmartDevelopment.Helpers</Product>
+    <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.11.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.12.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
   </ItemGroup>
 
 </Project>

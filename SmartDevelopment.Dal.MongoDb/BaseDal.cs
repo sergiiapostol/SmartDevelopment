@@ -29,7 +29,7 @@ namespace SmartDevelopment.Dal.MongoDb
         {
             get
             {
-                return _collection = _collection ?? GetCollection();
+                return _collection ??= GetCollection();
             }
         }
 
@@ -40,10 +40,11 @@ namespace SmartDevelopment.Dal.MongoDb
             return GetCollection<TEntity>(collectionName);
         }
 
-        protected IMongoCollection<TEntity2> GetCollection<TEntity2>(string collectionName)
+        protected IMongoCollection<TEntity2> GetCollection<TEntity2>(string collectionName = null)
             where TEntity2 : IDbEntity
         {
             var db = DatabaseFactory.Get();
+            collectionName ??= typeof(TEntity2).Name;
             return db.GetCollection<TEntity2>(collectionName);
         }
 
@@ -138,7 +139,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
             var result =
                 await
-                    Collection.ReplaceOneAsync(v => v.Id.Equals(id), entity, new UpdateOptions { IsUpsert = true })
+                    Collection.ReplaceOneAsync(v => v.Id.Equals(id), entity, new ReplaceOptions { IsUpsert = true })
                         .ConfigureAwait(false);
 
             if (result.IsAcknowledged && result.MatchedCount == 0)
