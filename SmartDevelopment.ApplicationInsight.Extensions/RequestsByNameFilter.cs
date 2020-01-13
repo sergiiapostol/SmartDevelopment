@@ -34,10 +34,14 @@ namespace SmartDevelopment.ApplicationInsight.Extensions
         {
             if (item is RequestTelemetry)
             {
-                var request = item as RequestTelemetry;
-                return !(request.Success ?? false) || !Settings.NamesToExclude.Any(v => 
-                    request.Name.Contains(v) ||
-                    request.Url.OriginalString.Contains(v));
+                try
+                {
+                    var request = item as RequestTelemetry;
+                    return !(request.Success ?? false) || !Settings.NamesToExclude.Any(v =>
+                        request.Name.Contains(v) ||
+                        request.Url.OriginalString.Contains(v));
+                }
+                catch { }
             }
             return true;
         }

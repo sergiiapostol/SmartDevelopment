@@ -14,7 +14,11 @@ namespace SmartDevelopment.ApplicationInsight.Extensions
 
         public void Process(ITelemetry item)
         {
-            if (!string.IsNullOrEmpty(item.Context.Operation.SyntheticSource)) { return; }
+            try
+            {
+                if (!string.IsNullOrEmpty(item.Context.Operation.SyntheticSource)) { return; }
+            }
+            catch { }
 
             Next.Process(item);
         }

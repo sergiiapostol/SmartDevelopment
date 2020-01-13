@@ -31,6 +31,8 @@ namespace SmartDevelopment.Asp.Caching
                     context.Response.Headers[header.Key] = header.Value;
                 }
 
+                context.Items.TryAdd("OutputCache", true);
+
                 await context.Response.Body.WriteAsync(Content, 0, Content.Length).ConfigureAwait(false);                
             }
         }
