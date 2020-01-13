@@ -15,17 +15,12 @@ namespace SmartDevelopment.DependencyTracking
             _dependencyStore = dependencyStore;
         }
 
-        public IDisposable Start(string type, string name, string description)
+        public DependencyItem Start(string type, string name, string description)
         {
             return new DependencyItem(_dependencyStore, _dependencySettings).Start(type, name, description);
         }
 
-        public void Dependency(string type, string name, string description, bool success, TimeSpan duration)
-        {
-            new DependencyItem(_dependencyStore, _dependencySettings).Creat(type, name, description, success, duration).Dispose();
-        }
-
-        private class DependencyItem : IDisposable
+        public class DependencyItem : DependencyTracking.DependencyItem, IDisposable
         {
             private Stopwatch _stopwatch;
 
@@ -39,41 +34,33 @@ namespace SmartDevelopment.DependencyTracking
                 _dependencySettings = dependencySettings;
             }
 
-            public string Type { get; private set; }
-
-            public string Name { get; private set; }
-
-            public string Description { get; private set; }
-
-            public bool Success { get; private set; }
-
-            public TimeSpan Elapsed { get; private set; }
-
             public DependencyItem Start(string type, string name, string description)
             {
                 Type = type;
                 Name = name;
                 Description = description;
+                StartTime = DateTime.UtcNow;
                 _stopwatch = Stopwatch.StartNew();
 
                 return this;
             }
 
-            public DependencyItem Succeed()
+            public DependencyItem Succeed(TimeSpan? duration = null)
             {
-                _stopwatch.Stop();
-                Success = true;
-
-                return this;
+                return Complete(true, duration);
             }
 
-            public DependencyItem Creat(string type, string name, string description, bool success, TimeSpan duration)
+            public DependencyItem Failed(TimeSpan? duration = null)
             {
-                Type = type;
-                Name = name;
-                Description = description;
-                Success = success;
-                Elapsed = duration;
+                return Complete(false, duration);
+            }
+
+            private DependencyItem Complete(bool status, TimeSpan? duration)
+            {
+                _stopwatch.Stop();
+                Duration = duration ?? _stopwatch.Elapsed;
+                _stopwatch = null;
+                IsSucess = status;                
 
                 return this;
             }
@@ -86,13 +73,13 @@ namespace SmartDevelopment.DependencyTracking
                     {
                         _stopwatch.Stop();
                     }
-                    Elapsed = _stopwatch.Elapsed;
+                    Duration = _stopwatch.Elapsed;
                 }
 
                 if (_dependencySettings.Detailed == DetailsLevel.All
-                    || ((_dependencySettings.Detailed & DetailsLevel.Failed) == DetailsLevel.Failed && !Success)
+                    || ((_dependencySettings.Detailed & DetailsLevel.Failed) == DetailsLevel.Failed && !IsSucess)
                     || ((_dependencySettings.Detailed & DetailsLevel.Slow) == DetailsLevel.Slow
-                     && Elapsed.TotalMilliseconds >= _dependencySettings.SlowDependencyDurationMs))
+                     && Duration.TotalMilliseconds >= _dependencySettings.SlowDependencyDurationMs))
                 {
                     Description = Description;
                 }
@@ -105,7 +92,7 @@ namespace SmartDevelopment.DependencyTracking
                     Description = null;
                 }
 
-                _dependencyStore.StoreDependency(Type, Name, Description, Success, Elapsed);
+                _dependencyStore.StoreDependency(this);
             }
         }
     }

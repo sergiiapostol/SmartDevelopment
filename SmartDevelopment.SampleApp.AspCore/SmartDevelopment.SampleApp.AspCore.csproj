@@ -26,10 +26,10 @@
     <ProjectReference Include="..\SmartDevelopment.ApplicationInsight.Extensions\SmartDevelopment.ApplicationInsight.Extensions.csproj" />
     <ProjectReference Include="..\SmartDevelopment.AzureStorage\SmartDevelopment.AzureStorage.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Dal.MongoDb\SmartDevelopment.Dal.MongoDb.csproj" />
+    <ProjectReference Include="..\SmartDevelopment.DependencyTracking.ApplicationInsights\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj" />
     <ProjectReference Include="..\SmartDevelopment.DependencyTracking.MongoDb\SmartDevelopment.DependencyTracking.MongoDb.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Identity\SmartDevelopment.Identity.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Logging\SmartDevelopment.Logging.csproj" />
-    <ProjectReference Include="..\SmartDevelopment.Profiling\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj" />
   </ItemGroup>
 
   <ItemGroup>

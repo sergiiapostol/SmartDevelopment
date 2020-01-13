@@ -10,7 +10,7 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
 {
     internal class ProfiledMongoClientSettings
     {
-        private readonly ConcurrentDictionary<int, string> _queriesBuffer = new ConcurrentDictionary<int, string>();
+        private readonly ConcurrentDictionary<int, DependencyProfiler.DependencyItem> _queriesBuffer = new ConcurrentDictionary<int, DependencyProfiler.DependencyItem>();
 
         private readonly DependencyProfiler _dependencyProfiler;
 
@@ -31,8 +31,9 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
                 {
                     if (e.Command != null && !ignoredCommands.Contains(e.CommandName.ToLower()))
                     {
+                        var dependencyItem = _dependencyProfiler.Start(_dependencyName, e.CommandName, e.Command.ToString());
                         // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                        _queriesBuffer.TryAdd(e.RequestId, e.Command.ToString());
+                        _queriesBuffer.TryAdd(e.RequestId, dependencyItem);
                     }
                 }
                 catch
@@ -48,11 +49,10 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
 
                 try
                 {
-                    if (_queriesBuffer.TryRemove(e.RequestId, out var query))
+                    if (_queriesBuffer.TryRemove(e.RequestId, out var dependencyItem))
                     {
-                        OnCommandCompleted(
-                            new MongoCommandCompletedEventArgs(e.CommandName, query, true,
-                                e.Duration));
+                        dependencyItem.Succeed();
+                        dependencyItem.Dispose();
                     }
                 }
                 catch
@@ -67,21 +67,17 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
                     return;
                 try
                 {
-                    if (_queriesBuffer.TryRemove(e.RequestId, out var query))
-                        OnCommandCompleted(
-                            new MongoCommandCompletedEventArgs(e.CommandName, query, false,
-                                e.Duration));
+                    if (_queriesBuffer.TryRemove(e.RequestId, out var dependencyItem))
+                    {
+                        dependencyItem.Failed();
+                        dependencyItem.Dispose();
+                    }
                 }
                 catch
                 {
                     // ignored
                 }
             };
-        }
-
-        private void OnCommandCompleted(MongoCommandCompletedEventArgs args)
-        {
-            _dependencyProfiler.Dependency(_dependencyName, args.CommandName, args.Query, args.Success, args.Duration);
         }
 
         internal readonly Action<CommandStartedEvent> OnCommandStartEvent;
@@ -98,25 +94,6 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
                 cb.Subscribe(OnCommandSucceededEvent);
                 cb.Subscribe(OnCommandFailedEvent);
             };
-        }
-
-        private class MongoCommandCompletedEventArgs : EventArgs
-        {
-            public MongoCommandCompletedEventArgs(string commandName, string query, bool success, TimeSpan duration)
-            {
-                CommandName = commandName;
-                Query = query;
-                Success = success;
-                Duration = duration;
-            }
-
-            public string CommandName { get; }
-
-            public string Query { get; }
-
-            public bool Success { get; }
-
-            public TimeSpan Duration { get; }
         }
     }
 }
