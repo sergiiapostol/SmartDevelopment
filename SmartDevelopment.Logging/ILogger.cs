@@ -15,7 +15,7 @@ namespace SmartDevelopment.Logging
 
         void Debug(Exception ex, Dictionary<string, string> extra = null);
 
-        void Information(string message);
+        void Information(string message, Dictionary<string, string> extra = null);
 
         void Warning(string message, Dictionary<string, string> extra = null);
 

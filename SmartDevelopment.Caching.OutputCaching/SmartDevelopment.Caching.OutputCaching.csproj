@@ -5,10 +5,11 @@
     <Configurations>Debug;Release;Staging</Configurations>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>SmartDevelopment</Authors>
-    <Product>SmartDevelopment.Helpers</Product>
+    <Product>SmartDevelopment.Cache</Product>
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <Version>1.1.1</Version>
+    <Version>1.0.1</Version>
+    <PackageId>SmartDevelopment.Caching.OutputCaching</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,10 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartDevelopment.Caching.EnrichedMemoryCache\SmartDevelopment.Caching.EnrichedMemoryCache.csproj" />
   </ItemGroup>
 
 </Project>

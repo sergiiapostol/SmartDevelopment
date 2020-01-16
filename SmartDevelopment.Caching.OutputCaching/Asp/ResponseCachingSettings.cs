@@ -1,4 +1,4 @@
-﻿namespace SmartDevelopment.Asp.Caching
+﻿namespace SmartDevelopment.Caching.OutputCaching
 {
     public class ResponseCachingSettings
     {

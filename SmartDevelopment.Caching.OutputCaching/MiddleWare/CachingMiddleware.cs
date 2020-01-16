@@ -2,26 +2,26 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using SmartDevelopment.Caching.EnrichedMemoryCache;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace SmartDevelopment.Asp.Caching
+namespace SmartDevelopment.Caching.OutputCaching
 {
     public partial class CachingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IMemoryCache _memoryCache;
+        private readonly IEnrichedMemoryCache _memoryCache;
         private readonly ResponseCachingSettings _settings;
-        private readonly CacheBustingService _cacheBusting;
 
-        public CachingMiddleware(RequestDelegate next, IMemoryCache memoryCache, IOptions<ResponseCachingSettings> settings, CacheBustingService cacheBusting)
+        public CachingMiddleware(RequestDelegate next, IEnrichedMemoryCache memoryCache, IOptions<ResponseCachingSettings> settings)
         {
             _next = next;
             _memoryCache = memoryCache;
             _settings = settings.Value;
-            _cacheBusting = cacheBusting;
         }
 
         public async Task Invoke(HttpContext context)
@@ -41,20 +41,18 @@ namespace SmartDevelopment.Asp.Caching
                 CachedResponse cachedResponse = null;
                 if (context.User.Identity.IsAuthenticated)
                 {
-                    object cachedResponseO = _memoryCache.Get($"{cacheKey}_u:{context.User.FindFirst(ClaimTypes.NameIdentifier).Value}");
-                    if (cachedResponseO == null)
+                    cachedResponse = _memoryCache.Get<CachedResponse>($"{cacheKey}_u:{context.User.FindFirst(ClaimTypes.NameIdentifier).Value}");
+                    if (cachedResponse == null)
                     {
-                        cachedResponseO = _memoryCache.Get(cacheKey);
+                        cachedResponse = _memoryCache.Get<CachedResponse>(cacheKey);
 
-                        if ((cachedResponseO as CachedResponse)?.ForAnonymusUsers ?? false)
-                            cachedResponseO = null;
+                        if (cachedResponse?.ForAnonymusUsers ?? false)
+                            cachedResponse = null;
                     }
-
-                    cachedResponse = cachedResponseO as CachedResponse;
                 }
                 else
                 {
-                    cachedResponse = _memoryCache.Get(cacheKey) as CachedResponse;
+                    cachedResponse = _memoryCache.Get<CachedResponse>(cacheKey);
                 }
 
                 if (cachedResponse != null)
@@ -63,10 +61,7 @@ namespace SmartDevelopment.Asp.Caching
                     return;
                 }
             }
-            catch (Exception ex)
-            {
-                int i = 0;
-            }
+            catch { }
 
             var cachedItem = await CaptureResponse(context).ConfigureAwait(false);
             if (cachedItem != null)
@@ -91,15 +86,14 @@ namespace SmartDevelopment.Asp.Caching
 
                         var options = new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = duration };
 
-                        _cacheBusting.AsociateToken(context, cacheKey, options);
+                        Dictionary<string, string> tagsToApply = null;
+                        if (context.Items.TryGetValue(Consts.CachedObjectTags, out var tagsO) && tagsO is Dictionary<string, string> tags)
+                            tagsToApply = tags;
 
-                        _memoryCache.Set(cacheKey, cachedItem, options);
+                        await _memoryCache.Add(cacheKey, cachedItem, options, tagsToApply).ConfigureAwait(false);
                     }
                 }
-                catch (Exception ex)
-                {
-                    int i = 0;
-                }
+                catch { }
             }
         }
 
@@ -107,29 +101,27 @@ namespace SmartDevelopment.Asp.Caching
         {
             var responseStream = context.Response.Body;
 
-            using (var buffer = new MemoryStream())
+            using var buffer = new MemoryStream();
+            try
             {
-                try
-                {
-                    context.Response.Body = buffer;
+                context.Response.Body = buffer;
 
-                    await _next.Invoke(context);
-                }
-                finally
-                {
-                    context.Response.Body = responseStream;
-                }
-
-                if (buffer.Length == 0) return null;
-
-                var bytes = buffer.ToArray();
-
-                await responseStream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-
-                if (context.Response.StatusCode != 200) return null;
-
-                return new CachedResponse(bytes, context.Response.Headers);
+                await _next.Invoke(context);
             }
+            finally
+            {
+                context.Response.Body = responseStream;
+            }
+
+            if (buffer.Length == 0) return null;
+
+            var bytes = buffer.ToArray();
+
+            await responseStream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+
+            if (context.Response.StatusCode != 200) return null;
+
+            return new CachedResponse(bytes, context.Response.Headers);
         }
     }
 }

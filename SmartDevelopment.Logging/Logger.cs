@@ -82,9 +82,9 @@ namespace SmartDevelopment.Logging
             _logger.Log(LogLevel.Debug, _eventId, state, null, MessageGetter);
         }
 
-        public void Information(string message)
+        public void Information(string message, Dictionary<string, string> extra = null)
         {
-            var state = PrepareStateObject(BuildProperties(), message);
+            var state = PrepareStateObject(BuildProperties(extra), message);
 
             _logger.Log(LogLevel.Information, _eventId, state, null, MessageGetter);
         }

@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace SmartDevelopment.Asp.Caching
+namespace SmartDevelopment.Caching.OutputCaching
 {
     public class OutputCacheAttribute : Attribute, IAsyncActionFilter
     {

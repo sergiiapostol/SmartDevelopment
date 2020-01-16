@@ -15,9 +15,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using SmartDevelopment.ApplicationInsight.Extensions;
+using SmartDevelopment.Caching.OutputCaching;
 using SmartDevelopment.AzureStorage;
 using SmartDevelopment.AzureStorage.Blobs;
 using SmartDevelopment.AzureStorage.Queues;
+using SmartDevelopment.Caching.EnrichedMemoryCache;
 using SmartDevelopment.Dal.MongoDb;
 using SmartDevelopment.DependencyTracking;
 using SmartDevelopment.DependencyTracking.ApplicationInsights;
@@ -25,7 +27,6 @@ using SmartDevelopment.DependencyTracking.MongoDb;
 using SmartDevelopment.Identity;
 using SmartDevelopment.Logging;
 using SmartDevelopment.SampleApp.AspCore.Configuration;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace SmartDevelopment.SampleApp.AspCore
 {
@@ -70,7 +71,7 @@ namespace SmartDevelopment.SampleApp.AspCore
                     });
 
             services.Configure<JwtTokenConfiguration>(Configuration.GetSection("JwtToken"));
-
+            services.Configure<ResponseCachingSettings>(Configuration.GetSection("ResponseCachingSettings"));
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings
@@ -109,6 +110,11 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.AddHttpContextAccessor();
             services.AddResponseCompression();
             services.AddResponseCaching();
+
+            services.AddMemoryCache(v => { v.CompactionPercentage = 0.9; });
+            services.AddSingleton<IEnrichedMemoryCache, EnrichedMemoryCache>();
+
+            services.AddSingleton<OutputCacheManager>();
 
             services.AddAuthentication(options =>
             {
@@ -164,9 +170,6 @@ namespace SmartDevelopment.SampleApp.AspCore
                         }
                     });
             });
-
-            services.AddResponseCaching();
-
             services.AddLogger(Configuration.GetSection("LoggerSettings").Get<LoggerSettings>());
 
             services.AddDependencyTrackingWithApplicationInsights(Configuration.GetSection("DependencySettings").Get<DependencySettings>());
@@ -195,6 +198,8 @@ namespace SmartDevelopment.SampleApp.AspCore
             }
 
             app.UseAuthentication();
+
+            app.UseMiddleware<CachingMiddleware>();
 
             app.UseMvc(routes =>
             {
