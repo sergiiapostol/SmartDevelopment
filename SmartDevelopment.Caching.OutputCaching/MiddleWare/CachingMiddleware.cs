@@ -80,11 +80,18 @@ namespace SmartDevelopment.Caching.OutputCaching
                                 cachedItem.ForAnonymusUsers = true;
                         }
 
+                        var slidingDuration = (context.Items.TryGetValue(Consts.SlidingDurationKey, out object slidingDurationO) && (slidingDurationO is int)) ?
+                            TimeSpan.FromSeconds((int)slidingDurationO) : TimeSpan.Zero;
+
                         var duration = (context.Items.TryGetValue(Consts.DurationKey, out object durationO) && (durationO is int)) ?
                             TimeSpan.FromSeconds((int)durationO) :
                             TimeSpan.FromSeconds(_settings.MaxCacheInSec);
 
-                        var options = new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = duration };
+                        var options = new MemoryCacheEntryOptions();
+                        if (slidingDuration > TimeSpan.Zero)
+                            options.SlidingExpiration = slidingDuration;
+                        else
+                            options.AbsoluteExpirationRelativeToNow = duration;
 
                         Dictionary<string, string> tagsToApply = null;
                         if (context.Items.TryGetValue(Consts.CachedObjectTags, out var tagsO) && tagsO is Dictionary<string, string> tags)

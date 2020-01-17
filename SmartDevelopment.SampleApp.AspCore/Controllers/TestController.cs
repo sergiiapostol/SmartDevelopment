@@ -51,7 +51,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         }
 
 
-        [OutputCache(false, 5)]
+        [OutputCache(false, SlidingDurationInSec = 5)]
         [HttpGet, Route("Cache")]
         public ActionResult CacheCreate()
         {

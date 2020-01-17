@@ -8,6 +8,8 @@
 
         public const string DurationKey = "CacheDuration";
 
+        public const string SlidingDurationKey = "SlidingDuration";
+
         public const string IsUserSpecificKey = "IsUserSpecific";
     }
 }

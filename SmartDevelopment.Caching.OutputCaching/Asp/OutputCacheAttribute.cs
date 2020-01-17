@@ -7,21 +7,26 @@ namespace SmartDevelopment.Caching.OutputCaching
     public class OutputCacheAttribute : Attribute, IAsyncActionFilter
     {
         protected bool _isUserSpecific;
-        private readonly int _durationInSec;
 
         public bool IsCachable { get; set; } = true;
 
-        public OutputCacheAttribute(bool isUserSpecific, int durationInSec)
+        public OutputCacheAttribute(bool isUserSpecific)
         {
             _isUserSpecific = isUserSpecific;
-            _durationInSec = durationInSec;
         }
+
+        public int DurationInSec { get; set; }
+
+        public int SlidingDurationInSec { get; set; }
 
         public virtual Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {            
             context.HttpContext.Items[Consts.IsCachebleKey] = IsCachable;
             context.HttpContext.Items[Consts.IsUserSpecificKey] = _isUserSpecific;
-            context.HttpContext.Items[Consts.DurationKey] = _durationInSec;
+            if(DurationInSec > 0)
+                context.HttpContext.Items[Consts.DurationKey] = DurationInSec;
+            if (SlidingDurationInSec > 0)
+                context.HttpContext.Items[Consts.SlidingDurationKey] = SlidingDurationInSec;
 
             return next.Invoke();
         }
