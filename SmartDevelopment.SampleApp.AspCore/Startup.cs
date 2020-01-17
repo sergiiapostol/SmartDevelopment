@@ -97,11 +97,7 @@ namespace SmartDevelopment.SampleApp.AspCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging(loggingBuilder => loggingBuilder.AddApplicationInsights());
-            services.AddLogging(loggingBuilder => loggingBuilder.AddApplicationInsights());
-            var aiOptions = Configuration.GetSection("ApplicationInsightsOptions").Get<ApplicationInsightsServiceOptions>() ??
-                new ApplicationInsightsServiceOptions();
-            services.AddApplicationInsightsTelemetry(aiOptions);
+            services.AddApplicationInsightsTelemetry();
             services.AddApplicationInsightsTelemetryProcessor<RequestsBySynteticSourceFilter>();
             services.AddApplicationInsightsTelemetryProcessor<RequestsByNameFilter>();
 

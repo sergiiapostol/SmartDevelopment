@@ -27,7 +27,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         {
             _memoryCache = memoryCache;
             _logger = logger;
-            _timer = new Timer(ReportUsage, this, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+            _timer = new Timer(ReportUsage, this, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
         }
 
         public Task<TEntity> GetOrAdd<TEntity>(string key, Func<Task<TEntity>> valueGetter, 
