@@ -16,6 +16,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger _logger;
 
+
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentDictionary<string, CancellationTokenSource>>> _cancelationTokens =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentDictionary<string, CancellationTokenSource>>>();
 
@@ -140,7 +141,8 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             _logger.Information("Cache item evicted", new Dictionary<string, string> {
                 {"Key", key },
                 {"Usage", usageCounter.UsageCounter.ToString() },
-                { "Entity", usageCounter.Type.Name}
+                { "Entity", usageCounter.Type.Name},
+                { "Reason", reason.ToString()}
             });
         }        
 
@@ -160,6 +162,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         {
             if (_timer != null)
             {
+                ReportUsage(this);
                 _timer.Dispose();
                 _timer = null;
             }
@@ -177,30 +180,6 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             public long UsageCounter { get; set; }
 
             public Type Type { get; set; }
-        }
-        
-        //private class EnrichedMemoryCacheItem<TEntity> : IEnrichedMemoryCacheItem<TEntity>
-        //{
-        //    private readonly EnrichedMemoryCache _enrichedMemoryCache;            
-
-        //    internal EnrichedMemoryCacheItem(EnrichedMemoryCache owner, MemoryCacheEntryOptions cacheOptions, string key, TEntity value)
-        //    {
-        //        _enrichedMemoryCache = owner;
-        //        CacheOptions = cacheOptions;
-        //        Key = key;
-        //        Value = value;
-        //    }
-
-        //    public string Key { get; private set; }
-
-        //    public TEntity Value { get; private set; }
-
-        //    public MemoryCacheEntryOptions CacheOptions { get; private set; }
-
-        //    public void ApplyTags(Dictionary<string, string> tags)
-        //    {
-        //        _enrichedMemoryCache.ApplyTags(Key, tags, CacheOptions);
-        //    }
-        //}
+        }        
     }
 }
