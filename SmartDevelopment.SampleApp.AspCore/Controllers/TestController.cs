@@ -51,18 +51,24 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         }
 
 
-        [OutputCache(false, SlidingDurationInSec = 5)]
+        [OutputCache(false, SlidingDurationInSec = 500)]
         [HttpGet, Route("Cache")]
-        public ActionResult CacheCreate()
+        public async Task<ActionResult> CacheCreate()
         {
             _outputCacheManager.TagCache(ControllerContext.HttpContext, new Dictionary<string, string> { { "TagKey", "TagValue" } });
+            
+            await _enrichedMemoryCache.GetOrAdd("TestValue1", () => Task.FromResult(1), new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { },
+                new Dictionary<string, string> { { "TagKey1", "TagValue" } });
+            
+            await _enrichedMemoryCache.GetOrAdd("TestValue2", () => Task.FromResult(2), new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { },
+                new Dictionary<string, string> { { "TagKey1", "TagValue" } });
             return Ok(5);
         }
 
         [HttpDelete, Route("Cache")]
         public ActionResult CacheDelete()
         {
-            _outputCacheManager.ReleaseCache(new Dictionary<string, string> { { "TagKey", "TagValue" } });
+            _outputCacheManager.ReleaseCache(new Dictionary<string, string> { { "TagKey1", "TagValue" } });
             return Ok();
         }
 

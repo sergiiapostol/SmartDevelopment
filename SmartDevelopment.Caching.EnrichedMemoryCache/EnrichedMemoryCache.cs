@@ -71,7 +71,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         public TEntity Get<TEntity>(string key)
         {
             var result =  _memoryCache.Get<TEntity>(key);
-            if(result != null)
+            if(default(TEntity).Equals(result))
                 _cacheKeyUsage.AddOrUpdate(key,
                 v => new CacheItemUsage { Type = typeof(TEntity), UsageCounter = 0 },
                 (k, v) =>

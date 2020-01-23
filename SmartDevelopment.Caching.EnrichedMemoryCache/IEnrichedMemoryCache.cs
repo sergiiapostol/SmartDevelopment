@@ -6,15 +6,6 @@ using static SmartDevelopment.Caching.EnrichedMemoryCache.EnrichedMemoryCache;
 
 namespace SmartDevelopment.Caching.EnrichedMemoryCache
 {
-    //public interface IEnrichedMemoryCacheItem<TEntity>
-    //{
-    //    public string Key { get; }
-
-    //    public TEntity Value { get; }
-
-    //    void ApplyTags(Dictionary<string, string> tags);
-    //}
-
     public interface IEnrichedMemoryCache
     {
         Task<TEntity> GetOrAdd<TEntity>(string key, Func<Task<TEntity>> valueGetter, MemoryCacheEntryOptions options, Dictionary<string, string> tags = null);
