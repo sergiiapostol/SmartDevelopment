@@ -52,6 +52,8 @@ namespace SmartDevelopment.AzureStorage.Queues
         public async Task<QueueMessage<TMessage>> Get()
         {
             var item = await Queue.GetMessageAsync().ConfigureAwait(false);
+            if (item == null)
+                return null;
             var  message = JsonConvert.DeserializeObject<TMessage>(item.AsString);
             return new QueueMessage<TMessage>(message, item);
         }
