@@ -8,7 +8,7 @@
     <Product>SmartDevelopment.Cache</Product>
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <Version>1.0.7</Version>
+    <Version>1.0.10</Version>
   </PropertyGroup>
 
   <ItemGroup>

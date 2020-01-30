@@ -54,7 +54,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         [OutputCache(false, SlidingDurationInSec = 500)]
         [HttpGet, Route("Cache")]
         public async Task<ActionResult> CacheCreate()
-        {
+        {            
             _outputCacheManager.TagCache(ControllerContext.HttpContext, new Dictionary<string, string> { { "TagKey", "TagValue" } });
             
             await _enrichedMemoryCache.GetOrAdd("TestValue1", () => Task.FromResult(1), new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { },
@@ -62,6 +62,9 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
             
             await _enrichedMemoryCache.GetOrAdd("TestValue2", () => Task.FromResult(2), new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { },
                 new Dictionary<string, string> { { "TagKey1", "TagValue" } });
+
+            var a = _enrichedMemoryCache.Get<object>("TestValue2");
+
             return Ok(5);
         }
 
