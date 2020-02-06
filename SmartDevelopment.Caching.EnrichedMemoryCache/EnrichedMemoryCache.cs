@@ -152,11 +152,17 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         {
             if (state is EnrichedMemoryCache memoryCahceInstance)
             {
-                var usage = memoryCahceInstance._cacheKeyUsage
-                    .GroupBy(v => v.Value.Type)
-                    .ToDictionary( v=>v.Key.Name, v =>$"Items: {v.Count()}, TotalUsage: {v.Sum(v => v.Value.UsageCounter)}");                
+                try
+                {
+                    var usage = new Dictionary<string, CacheItemUsage>(memoryCahceInstance._cacheKeyUsage)
+                        .GroupBy(v => v.Value.Type)
+                        .ToDictionary(v => v.Key.Name, v => $"Items: {v.Count()}, TotalUsage: {v.Sum(v => v.Value.UsageCounter)}");
 
-                memoryCahceInstance._logger.Information("Cache usage", usage);
+                    memoryCahceInstance._logger.Information("Cache usage", usage);
+                }catch(Exception ex)
+                {
+                    memoryCahceInstance._logger.Exception(ex);
+                }
             }
         }
 
