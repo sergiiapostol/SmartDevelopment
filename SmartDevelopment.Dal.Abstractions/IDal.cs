@@ -11,6 +11,8 @@ namespace SmartDevelopment.Dal.Abstractions
     public interface IDal<TEntity> : IDalMarker
         where TEntity : class, IDbEntity
     {
+        Task<ITransaction> OpenTransaction();
+
         Task<long> InsertAsync(TEntity entity);
         Task<long> InsertAsync(List<TEntity> entities);
         Task<InsertOrUpdateResult> InsertOrUpdateAsync(List<TEntity> entities);

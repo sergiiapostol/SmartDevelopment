@@ -58,6 +58,38 @@ namespace SmartDevelopment.Dal.MongoDb
 
         protected static IndexKeysDefinitionBuilder<TEntity> IndexKeys => Builders<TEntity>.IndexKeys;
 
+        public async Task<ITransaction> OpenTransaction()
+        {
+            var session = await DatabaseFactory.Get().Client.StartSessionAsync().ConfigureAwait(false);
+            session.StartTransaction();
+            return new Transaction(session);
+        }
+
+        private class Transaction : ITransaction
+        {
+            private readonly IClientSessionHandle _session;
+
+            internal Transaction(IClientSessionHandle session)
+            {
+                _session = session;
+            }
+
+            public Task Commit()
+            {
+                return _session.CommitTransactionAsync();
+            }            
+
+            public Task Rollback()
+            {
+                return _session.AbortTransactionAsync();
+            }
+
+            public void Dispose()
+            {
+                _session.Dispose();
+            }
+        }
+
         #region Insert
 
         public virtual async Task<long> InsertAsync(TEntity entity)
