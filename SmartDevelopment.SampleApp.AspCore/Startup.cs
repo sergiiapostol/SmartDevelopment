@@ -27,8 +27,8 @@ using SmartDevelopment.Messaging;
 using SmartDevelopment.SampleApp.AspCore.Controllers;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using SmartDevelopment.Caching.EnrichedMemoryCache.Distributed;
 using SmartDevelopment.Caching.EnrichedMemoryCache;
+using SmartDevelopment.Caching.EnrichedMemoryCache.Distributed;
 
 namespace SmartDevelopment.SampleApp.AspCore
 {
