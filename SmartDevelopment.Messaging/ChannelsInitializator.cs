@@ -3,23 +3,23 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SmartDevelopment.AzureStorage.Queues
+namespace SmartDevelopment.Messaging
 {
-    public class QueuesInitializator
+    public class ChannelsInitializator
     {
-        private IEnumerable<IQueue> _queues { get; }
+        private readonly IEnumerable<IChannel> _channels;
 
-        private readonly ILogger<QueuesInitializator> _logger;
+        private readonly ILogger<ChannelsInitializator> _logger;
 
-        public QueuesInitializator(IEnumerable<IQueue> queues, ILogger<QueuesInitializator> logger)
+        public ChannelsInitializator(IEnumerable<IChannel> queues, ILogger<ChannelsInitializator> logger)
         {
-            _queues = queues;
+            _channels = queues;
             _logger = logger;
         }
 
         public async Task Init()
         {
-            foreach (var queue in _queues)
+            foreach (var queue in _channels)
             {
                 try
                 {

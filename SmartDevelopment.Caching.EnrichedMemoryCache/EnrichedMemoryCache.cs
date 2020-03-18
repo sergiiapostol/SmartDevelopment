@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using SmartDevelopment.Logging;
 using System;
@@ -11,10 +12,12 @@ using System.Threading.Tasks;
 
 namespace SmartDevelopment.Caching.EnrichedMemoryCache
 {
+
     public class EnrichedMemoryCache : IEnrichedMemoryCache, IDisposable
     {
         private readonly IMemoryCache _memoryCache;
         private readonly ILogger _logger;
+        private readonly EnrichedMemoryCacheSettings _settings;
 
 
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentDictionary<string, CancellationTokenSource>>> _cancelationTokens =
@@ -24,16 +27,25 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
         private Timer _timer;
 
-        public EnrichedMemoryCache(IMemoryCache memoryCache, ILogger<EnrichedMemoryCache> logger)
+        protected EnrichedMemoryCache(ILogger logger, IMemoryCache memoryCache, IOptions<EnrichedMemoryCacheSettings> settings) 
         {
             _memoryCache = memoryCache;
             _logger = logger;
             _timer = new Timer(ReportUsage, this, TimeSpan.FromMinutes(30), TimeSpan.FromMinutes(30));
+            _settings = settings.Value ?? new EnrichedMemoryCacheSettings { IsEnabled = true };
+        }
+
+        public EnrichedMemoryCache(IMemoryCache memoryCache, ILogger<EnrichedMemoryCache> logger, IOptions<EnrichedMemoryCacheSettings> settings)
+            :this(logger, memoryCache, settings)
+        {            
         }
 
         public Task<TEntity> GetOrAdd<TEntity>(string key, Func<Task<TEntity>> valueGetter, 
             MemoryCacheEntryOptions cacheOptions, Dictionary<string, string> tags = null)
         {
+            if (!_settings.IsEnabled)
+                return valueGetter();
+
             _cacheKeyUsage.AddOrUpdate(key,
                 v => new CacheItemUsage { Type = typeof(TEntity), UsageCounter = 0 },
                 (k, v) =>
@@ -70,6 +82,9 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
         public TEntity Get<TEntity>(string key)
         {
+            if (!_settings.IsEnabled)
+                return default(TEntity);
+
             var result =  _memoryCache.Get<TEntity>(key);
             if (result != null && !result.Equals(default(TEntity)))
             {
@@ -90,21 +105,27 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             await GetOrAdd(key, () => Task.FromResult(value), cacheOptions, tags).ConfigureAwait(false);
         }
 
-        public void Remove(string key)
+        public virtual Task Remove(string key)
         {
-            _memoryCache.Remove(key as string);
+            if (_settings.IsEnabled)
+                _memoryCache.Remove(key as string);
+
+            return Task.CompletedTask;
         }
 
-        public void Remove(Dictionary<string, string> tags)
+        public virtual Task Remove(Dictionary<string, string> tags)
         {
-            foreach (var tag in tags)
-            {
-                var sources = GetCancelationTokens(tag.Key, tag.Value);
-                foreach (var token in sources)
+            if (_settings.IsEnabled)
+                foreach (var tag in tags)
                 {
-                    token.Value.Cancel();
+                    var sources = GetCancelationTokens(tag.Key, tag.Value);
+                    foreach (var token in sources)
+                    {
+                        token.Value.Cancel();
+                    }
                 }
-            }
+
+            return Task.CompletedTask;
         }
 
         public IReadOnlyDictionary<string, CacheItemUsage> GetUsage()

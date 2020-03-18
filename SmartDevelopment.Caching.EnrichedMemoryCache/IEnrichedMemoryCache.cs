@@ -14,9 +14,9 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
         Task Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions options, Dictionary<string, string> tags = null);
 
-        void Remove(string key);
+        Task Remove(string key);
 
-        void Remove(Dictionary<string, string> tags);
+        Task Remove(Dictionary<string, string> tags);
 
         IReadOnlyDictionary<string, CacheItemUsage> GetUsage();
 

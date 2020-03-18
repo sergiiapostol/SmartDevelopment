@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -18,8 +16,6 @@ using SmartDevelopment.ApplicationInsight.Extensions;
 using SmartDevelopment.Caching.OutputCaching;
 using SmartDevelopment.AzureStorage;
 using SmartDevelopment.AzureStorage.Blobs;
-using SmartDevelopment.AzureStorage.Queues;
-using SmartDevelopment.Caching.EnrichedMemoryCache;
 using SmartDevelopment.Dal.MongoDb;
 using SmartDevelopment.DependencyTracking;
 using SmartDevelopment.DependencyTracking.ApplicationInsights;
@@ -27,6 +23,12 @@ using SmartDevelopment.DependencyTracking.MongoDb;
 using SmartDevelopment.Identity;
 using SmartDevelopment.Logging;
 using SmartDevelopment.SampleApp.AspCore.Configuration;
+using SmartDevelopment.Messaging;
+using SmartDevelopment.SampleApp.AspCore.Controllers;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using SmartDevelopment.Caching.EnrichedMemoryCache.Distributed;
+using SmartDevelopment.Caching.EnrichedMemoryCache;
 
 namespace SmartDevelopment.SampleApp.AspCore
 {
@@ -72,6 +74,8 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             services.Configure<JwtTokenConfiguration>(Configuration.GetSection("JwtToken"));
             services.Configure<ResponseCachingSettings>(Configuration.GetSection("ResponseCachingSettings"));
+            services.Configure<EnrichedMemoryCacheSettings>(Configuration.GetSection("EnrichedMemoryCacheSettings"));
+            services.Configure<DistributedEnrichedMemoryCacheSettings>(Configuration.GetSection("DistributedEnrichedMemoryCacheSettings"));
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings
@@ -95,7 +99,7 @@ namespace SmartDevelopment.SampleApp.AspCore
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry();
             services.AddApplicationInsightsTelemetryProcessor<RequestsBySynteticSourceFilter>();
@@ -108,9 +112,9 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.AddResponseCaching();
 
             services.AddMemoryCache(v => { v.CompactionPercentage = 0.9; });
-            services.AddSingleton<IEnrichedMemoryCache, EnrichedMemoryCache>();
+            services.AddDistributedEnrichedMemoryCacheInitializer();
 
-            services.AddSingleton<OutputCacheManager>();
+            services.AddSingleton<OutputCacheManager>();            
 
             services.AddAuthentication(options =>
             {
@@ -182,7 +186,20 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.AddSingleton<JwtSecurityTokenHandler>();
 
             services.AddBlobsInitializer(new AzureStorage.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("AzureStorage") });
-            services.AddQueuesInitializer(new AzureStorage.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("AzureStorage") });
+            services.AddBlobQueuesInitializer(new AzureStorage.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("AzureStorage") });
+            services.AddServiceBusQueuesInitializer(new ServiceBus.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("ServiceBus") });
+
+            var builder = new ContainerBuilder();
+            builder.Populate(services);
+            builder.Register(_ => Configuration).As<IConfiguration>().SingleInstance();
+            builder.RegisterType<TestQueueSender>().AsSelf().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<TestQeueuReceiver>().AsSelf().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<TestTopicSender>().AsSelf().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<TestTopicReceiver>().AsSelf().AsImplementedInterfaces().SingleInstance();
+            var autofaccontainer = builder.Build();
+
+            // Create the IServiceProvider based on the container.
+            return new AutofacServiceProvider(autofaccontainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -231,7 +248,7 @@ namespace SmartDevelopment.SampleApp.AspCore
                 var blobs = app.ApplicationServices.GetService<BlobsInitializator>();
                 await blobs.Init().ConfigureAwait(false);
 
-                var queues = app.ApplicationServices.GetService<QueuesInitializator>();
+                var queues = app.ApplicationServices.GetService<ChannelsInitializator>();                
                 await queues.Init().ConfigureAwait(false);
             });
         }

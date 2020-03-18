@@ -9,6 +9,7 @@ using SmartDevelopment.Caching.EnrichedMemoryCache;
 using SmartDevelopment.Dal.Abstractions;
 using SmartDevelopment.Dal.Abstractions.Models;
 using SmartDevelopment.Logging;
+using SmartDevelopment.ServiceBus;
 
 namespace SmartDevelopment.SampleApp.AspCore.Controllers
 {
@@ -21,14 +22,26 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         private readonly IDal<Identity.Entities.IdentityUser> _dal;
         private readonly OutputCacheManager _outputCacheManager;
         private readonly IEnrichedMemoryCache _enrichedMemoryCache;
+        private readonly TestQueueSender _testQueueSender;
+        private readonly TestQeueuReceiver _testQeueuReceiver;
+        private readonly TestTopicSender _testTopicSender;
+        private readonly TestTopicReceiver _testTopicReceiver;
+        private readonly Random _random;
 
         public TestController(ILogger<TestController> logger, IDal<Identity.Entities.IdentityUser> dal, 
-            OutputCacheManager outputCacheTagger, IEnrichedMemoryCache enrichedMemoryCache)
+            OutputCacheManager outputCacheTagger, IEnrichedMemoryCache enrichedMemoryCache,
+            TestQueueSender testQueueSender, TestQeueuReceiver testQeueuReceiver,
+            TestTopicSender testTopicSender, TestTopicReceiver testTopicReceiver)
         {
             _logger = logger;
             _dal = dal;
             _outputCacheManager = outputCacheTagger;
             _enrichedMemoryCache = enrichedMemoryCache;
+            _testQueueSender = testQueueSender;
+            _testQeueuReceiver = testQeueuReceiver;
+            _testTopicSender = testTopicSender;
+            _testTopicReceiver = testTopicReceiver;
+            _random = new Random();
         }
 
         [HttpGet, Route("Logger")]
@@ -69,9 +82,9 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         }
 
         [HttpDelete, Route("Cache")]
-        public ActionResult CacheDelete()
+        public async Task<ActionResult> CacheDelete()
         {
-            _outputCacheManager.ReleaseCache(new Dictionary<string, string> { { "TagKey1", "TagValue" } });
+            await _enrichedMemoryCache.Remove(new Dictionary<string, string> { { "TagKey1", "TagValue" } });
             return Ok();
         }
 
@@ -81,6 +94,72 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
             var cacheStatus = _enrichedMemoryCache.GetUsage();
             var tokens = _enrichedMemoryCache.GetCancelationTokens();
             return Ok(new { Usage = cacheStatus.ToDictionary(v=>v.Key, v=>$"Type: {v.Value.Type.Name}, Cound: {v.Value.UsageCounter}"), Tokens = tokens});
-        }               
+        }
+
+        [HttpPost, Route("TestQueue")]
+        public async Task<ActionResult> TestQueue()
+        {
+            await _testQueueSender.Add(new TestMessage { A = _random.Next() }).ConfigureAwait(false);
+            return Ok();
+        }
+
+        [HttpPost, Route("TestTopic")]
+        public async Task<ActionResult> TestTopic()
+        {
+            await _testTopicSender.Add(new TestMessage { A = _random.Next() }).ConfigureAwait(false);
+            return Ok();
+        }
+    }
+
+    public class TestMessage
+    {
+        public int A { get; set; }
+    }
+    public class TestQueueSender : BaseQueueSender<TestMessage>
+    {
+        public TestQueueSender(ConnectionSettings connectionSettings) : base(connectionSettings, "TestQueue")
+        {
+        }
+    }
+
+    public class TestQeueuReceiver : BaseQueueReceiver<TestMessage>
+    {
+        private readonly ILogger _logger;
+
+        public TestQeueuReceiver(ConnectionSettings connectionSettings, ILogger<TestQeueuReceiver> logger) : 
+            base(connectionSettings, "TestQueue", logger)
+        {
+            _logger = logger;
+        }
+
+        public override Task ProcessMessage(TestMessage message)
+        {
+            _logger.Information("Qeueu: " + message.A.ToString());
+            return Task.CompletedTask;
+        }
+    }
+
+    public class TestTopicSender : BaseTopicSender<TestMessage>
+    {
+        public TestTopicSender(ConnectionSettings connectionSettings) : base(connectionSettings, "TestTopic")
+        {
+        }
+    }
+
+    public class TestTopicReceiver : BaseTopicReceiver<TestMessage>
+    {
+        private readonly ILogger _logger;
+
+        public TestTopicReceiver(ConnectionSettings connectionSettings, ILogger<TestQeueuReceiver> logger) :
+            base(connectionSettings, "TestTopic", "testsubscriber", logger)
+        {
+            _logger = logger;
+        }
+
+        public override Task ProcessMessage(TestMessage message)
+        {
+            _logger.Information("Topic:" + message.A.ToString());
+            return Task.CompletedTask;
+        }
     }
 }

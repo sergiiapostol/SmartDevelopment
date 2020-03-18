@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SmartDevelopment.AzureStorage.Blobs;
-using SmartDevelopment.AzureStorage.Queues;
 
 namespace SmartDevelopment.AzureStorage
 {
@@ -16,10 +15,10 @@ namespace SmartDevelopment.AzureStorage
             return services;
         }
 
-        public static IServiceCollection AddQueuesInitializer(this IServiceCollection services, ConnectionSettings connectionSettings)
+        public static IServiceCollection AddBlobQueuesInitializer(this IServiceCollection services, ConnectionSettings connectionSettings)
         {
             services.AddSingleton(connectionSettings);
-            services.AddSingleton<QueuesInitializator>();
+            MessagingServicesExtensions.AddChannelsInitializer(services);
 
             return services;
         }
