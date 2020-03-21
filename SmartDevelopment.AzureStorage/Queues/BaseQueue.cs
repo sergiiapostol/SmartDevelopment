@@ -19,7 +19,7 @@ namespace SmartDevelopment.AzureStorage.Queues
         Task Delete(QueueMessage<TMessage> message);
     }
 
-    public abstract class BaseQueue<TMessage> : IChannelSender<TMessage>
+    public abstract class BaseQueue<TMessage> : IQueue<TMessage>
         where TMessage : class
     {
         protected readonly CloudQueue Queue;

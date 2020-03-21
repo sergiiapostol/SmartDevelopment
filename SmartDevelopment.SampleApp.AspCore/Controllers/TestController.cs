@@ -55,7 +55,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
             _logger.Warning(new Exception("Warning"));
             _logger.Warning("Warning");
 
-            await _dal.SetAsync<Identity.Entities.IdentityUser>(v => v.CreatedAt > DateTime.UtcNow.Date, new List<PropertyUpdate<Identity.Entities.IdentityUser>> {
+            await _dal.SetAsync(v => v.CreatedAt > DateTime.UtcNow.Date, new List<PropertyUpdate<Identity.Entities.IdentityUser>> {
                 new PropertyUpdate<Identity.Entities.IdentityUser>(v=>v.Email, "test@bla.com"),
                 new PropertyUpdate<Identity.Entities.IdentityUser>(v=>v.SecurityStamp, "test@bla.com")
             }).ConfigureAwait(false);

@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.ServiceBus
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartDevelopment.Caching.EnrichedMemoryCache.Distributed", "SmartDevelopment.Caching.EnrichedMemoryCache.Distributed\SmartDevelopment.Caching.EnrichedMemoryCache.Distributed.csproj", "{9B375480-83A0-48E1-BC47-CDD93C59D598}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDevelopment.Dal.Cached", "SmartDevelopment.Dal.Cached\SmartDevelopment.Dal.Cached.csproj", "{3DC7F6D4-135F-4CC6-B3F5-13911727B639}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +182,12 @@ Global
 		{9B375480-83A0-48E1-BC47-CDD93C59D598}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B375480-83A0-48E1-BC47-CDD93C59D598}.Staging|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B375480-83A0-48E1-BC47-CDD93C59D598}.Staging|Any CPU.Build.0 = Debug|Any CPU
+		{3DC7F6D4-135F-4CC6-B3F5-13911727B639}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DC7F6D4-135F-4CC6-B3F5-13911727B639}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DC7F6D4-135F-4CC6-B3F5-13911727B639}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DC7F6D4-135F-4CC6-B3F5-13911727B639}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DC7F6D4-135F-4CC6-B3F5-13911727B639}.Staging|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DC7F6D4-135F-4CC6-B3F5-13911727B639}.Staging|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -207,6 +215,7 @@ Global
 		{FC486A4D-D8CF-4CD4-B8AC-8DE6D4802BA7} = {1170A70C-2271-4CE7-BC81-C981A09B955E}
 		{FB703270-0ED6-4A07-B44F-B851F5BD236B} = {1170A70C-2271-4CE7-BC81-C981A09B955E}
 		{9B375480-83A0-48E1-BC47-CDD93C59D598} = {5D4768C4-D3B7-4543-A7AB-06B34676E810}
+		{3DC7F6D4-135F-4CC6-B3F5-13911727B639} = {2A556271-213F-4525-8F05-C08C187293CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F3B14051-BA26-4384-B0DE-6D46EECE90BF}

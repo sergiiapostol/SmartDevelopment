@@ -92,7 +92,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
         #region Insert
 
-        public virtual async Task<long> InsertAsync(TEntity entity)
+        public async Task<long> InsertAsync(TEntity entity)
         {
             if (entity == null)
                 throw new NullReferenceException("Entity is required");
@@ -110,7 +110,7 @@ namespace SmartDevelopment.Dal.MongoDb
             return 1;
         }
 
-        public virtual async Task<long> InsertAsync(List<TEntity> entities)
+        public async Task<long> InsertAsync(List<TEntity> entities)
         {
             if (entities == null)
                 throw new NullReferenceException("Entities is required");
@@ -128,7 +128,7 @@ namespace SmartDevelopment.Dal.MongoDb
                 }
             }
 
-            return (long)entities.Count;
+            return entities.Count;
         }
 
         public virtual async Task<InsertOrUpdateResult> InsertOrUpdateAsync(List<TEntity> entities)
@@ -180,7 +180,7 @@ namespace SmartDevelopment.Dal.MongoDb
             return entity;
         }
 
-        public async Task<long> UpdateAsync(IList<TEntity> entities)
+        public virtual async Task<long> UpdateAsync(IList<TEntity> entities)
         {
             if (entities == null)
                 throw new NullReferenceException("Entities is required");
@@ -206,21 +206,43 @@ namespace SmartDevelopment.Dal.MongoDb
         public Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
             Expression<Func<TEntity, TProperty>> property, TProperty value)
         {
-            return SetAsync(Filter.Where(filter), Update.Set(property, value).Set(v => v.ModifiedAt, DateTime.UtcNow));
-        }        
+            return SetAsync(Filter.Where(filter), Update.Set(property, value));
+        }
 
-        public Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
-            List<PropertyUpdate<TEntity>> updates)
+        public Task SetAsync<TProperty>(ObjectId id,
+            Expression<Func<TEntity, TProperty>> property, TProperty value)
+        {
+            return SetAsync(id, Update.Set(property, value));
+        }
+
+        private UpdateDefinition<TEntity> CreateUpdateDefinition(List<PropertyUpdate<TEntity>> updates)
+        {
+            if (updates.Count == 0)
+                return null;
+
+            var sets = Update.Set(updates[0].Property, updates[0].Value);
+            foreach (var update in updates.Skip(1))
+            {
+                sets = sets.Set(update.Property, update.Value);
+            }
+
+            return sets;
+        }
+
+        public Task<long> SetAsync(Expression<Func<TEntity, bool>> filter, List<PropertyUpdate<TEntity>> updates)
         {
             if (updates?.Count < 1)
                 return Task.FromResult(0L);
 
-            var sets = Update.Set(v => v.ModifiedAt, DateTime.UtcNow);
-            foreach(var update in updates)
-            {
-                sets = sets.Set(update.Property, update.Value);
-            }
-            return SetAsync(Filter.Where(filter), sets);
+            return SetAsync(Filter.Where(filter), CreateUpdateDefinition(updates));
+        }
+
+        public Task SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates)
+        {
+            if (updates?.Count < 1)
+                return Task.FromResult(0L);
+
+            return SetAsync(id, CreateUpdateDefinition(updates));
         }
 
         protected async Task<long> SetAsync(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update,
@@ -230,16 +252,27 @@ namespace SmartDevelopment.Dal.MongoDb
             return result.ModifiedCount + (result.UpsertedId != null ? 1 : 0);
         }
 
+        protected virtual Task SetAsync(ObjectId id, UpdateDefinition<TEntity> update,
+            UpdateOptions options = null)
+        {
+            return SetAsync(Filter.Eq(v => v.Id, id), update, options);
+        }
+
         public Task<long> IncrementProperty<TProperty>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TProperty>> property, TProperty value)
         {
             return SetAsync(filter, Update.Inc(property, value));
+        }
+
+        public Task IncrementProperty<TProperty>(ObjectId id, Expression<Func<TEntity, TProperty>> property, TProperty value)
+        {
+            return SetAsync(id, Update.Inc(property, value));
         }
 
         #endregion
 
         #region Delete
 
-        public virtual Task DeleteAsync(TEntity entity)
+        public Task DeleteAsync(TEntity entity)
         {
             return DeleteAsync(entity.Id);
         }
