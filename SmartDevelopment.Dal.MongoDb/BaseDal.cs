@@ -209,7 +209,7 @@ namespace SmartDevelopment.Dal.MongoDb
             return SetAsync(Filter.Where(filter), Update.Set(property, value));
         }
 
-        public Task SetAsync<TProperty>(ObjectId id,
+        public Task<long> SetAsync<TProperty>(ObjectId id,
             Expression<Func<TEntity, TProperty>> property, TProperty value)
         {
             return SetAsync(id, Update.Set(property, value));
@@ -237,7 +237,7 @@ namespace SmartDevelopment.Dal.MongoDb
             return SetAsync(Filter.Where(filter), CreateUpdateDefinition(updates));
         }
 
-        public Task SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates)
+        public Task<long> SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates)
         {
             if (updates?.Count < 1)
                 return Task.FromResult(0L);
@@ -252,7 +252,7 @@ namespace SmartDevelopment.Dal.MongoDb
             return result.ModifiedCount + (result.UpsertedId != null ? 1 : 0);
         }
 
-        protected virtual Task SetAsync(ObjectId id, UpdateDefinition<TEntity> update,
+        protected virtual Task<long> SetAsync(ObjectId id, UpdateDefinition<TEntity> update,
             UpdateOptions options = null)
         {
             return SetAsync(Filter.Eq(v => v.Id, id), update, options);
@@ -263,7 +263,7 @@ namespace SmartDevelopment.Dal.MongoDb
             return SetAsync(filter, Update.Inc(property, value));
         }
 
-        public Task IncrementProperty<TProperty>(ObjectId id, Expression<Func<TEntity, TProperty>> property, TProperty value)
+        public Task<long> IncrementProperty<TProperty>(ObjectId id, Expression<Func<TEntity, TProperty>> property, TProperty value)
         {
             return SetAsync(id, Update.Inc(property, value));
         }
