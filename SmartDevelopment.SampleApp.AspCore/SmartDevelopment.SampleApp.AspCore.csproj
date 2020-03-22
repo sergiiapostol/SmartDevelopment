@@ -28,6 +28,7 @@
     <ProjectReference Include="..\SmartDevelopment.AzureStorage\SmartDevelopment.AzureStorage.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Caching.EnrichedMemoryCache.Distributed\SmartDevelopment.Caching.EnrichedMemoryCache.Distributed.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Caching.OutputCaching\SmartDevelopment.Caching.OutputCaching.csproj" />
+    <ProjectReference Include="..\SmartDevelopment.Dal.Cached\SmartDevelopment.Dal.Cached.csproj" />
     <ProjectReference Include="..\SmartDevelopment.Dal.MongoDb\SmartDevelopment.Dal.MongoDb.csproj" />
     <ProjectReference Include="..\SmartDevelopment.DependencyTracking.ApplicationInsights\SmartDevelopment.DependencyTracking.ApplicationInsights.csproj" />
     <ProjectReference Include="..\SmartDevelopment.DependencyTracking.MongoDb\SmartDevelopment.DependencyTracking.MongoDb.csproj" />
