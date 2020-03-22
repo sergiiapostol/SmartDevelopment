@@ -29,6 +29,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using SmartDevelopment.Caching.EnrichedMemoryCache;
 using SmartDevelopment.Caching.EnrichedMemoryCache.Distributed;
+using SmartDevelopment.Dal.Cached;
 
 namespace SmartDevelopment.SampleApp.AspCore
 {
@@ -196,6 +197,8 @@ namespace SmartDevelopment.SampleApp.AspCore
             builder.RegisterType<TestQeueuReceiver>().AsSelf().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<TestTopicSender>().AsSelf().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<TestTopicReceiver>().AsSelf().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<TestDal>().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<TestDalCached>().As<IDalCached<TestEntity>>().SingleInstance();
             var autofaccontainer = builder.Build();
 
             // Create the IServiceProvider based on the container.
