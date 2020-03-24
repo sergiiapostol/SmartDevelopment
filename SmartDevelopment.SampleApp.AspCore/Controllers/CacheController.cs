@@ -13,12 +13,10 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
     [AllowAnonymous]
     public class CacheController : ControllerBase
     {
-        private readonly OutputCacheManager _outputCacheManager;
         private readonly IEnrichedMemoryCache _enrichedMemoryCache;
 
-        public CacheController(OutputCacheManager outputCacheTagger, IEnrichedMemoryCache enrichedMemoryCache)
+        public CacheController(IEnrichedMemoryCache enrichedMemoryCache)
         {
-            _outputCacheManager = outputCacheTagger;
             _enrichedMemoryCache = enrichedMemoryCache;
         }
 
@@ -27,8 +25,6 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         [HttpGet, Route("Cache")]
         public async Task<ActionResult> CacheCreate()
         {            
-            _outputCacheManager.TagCache(ControllerContext.HttpContext, new Dictionary<string, string> { { "TagKey", "TagValue" } });
-            
             await _enrichedMemoryCache.GetOrAdd("TestValue1", () => Task.FromResult(1), new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { },
                 new Dictionary<string, string> { { "TagKey1", "TagValue" } });
             
@@ -36,6 +32,8 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
                 new Dictionary<string, string> { { "TagKey1", "TagValue" } });
 
             var a = _enrichedMemoryCache.Get<object>("TestValue2");
+
+            var b = _enrichedMemoryCache.Get<object>("bla");
 
             return Ok(5);
         }
