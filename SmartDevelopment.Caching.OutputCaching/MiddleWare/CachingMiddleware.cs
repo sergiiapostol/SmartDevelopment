@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using SmartDevelopment.Caching.EnrichedMemoryCache;
+using SmartDevelopment.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,12 +17,15 @@ namespace SmartDevelopment.Caching.OutputCaching
         private readonly RequestDelegate _next;
         private readonly IEnrichedMemoryCache _memoryCache;
         private readonly ResponseCachingSettings _settings;
+        private readonly ILogger<CachingMiddleware> _logger;
 
-        public CachingMiddleware(RequestDelegate next, IEnrichedMemoryCache memoryCache, IOptions<ResponseCachingSettings> settings)
+        public CachingMiddleware(RequestDelegate next, IEnrichedMemoryCache memoryCache, 
+            IOptions<ResponseCachingSettings> settings, ILogger<CachingMiddleware> logger)
         {
             _next = next;
             _memoryCache = memoryCache;
             _settings = settings.Value;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
@@ -61,7 +65,9 @@ namespace SmartDevelopment.Caching.OutputCaching
                     return;
                 }
             }
-            catch { }
+            catch(Exception ex) {
+                _logger.Exception(ex);
+            }
 
             var cachedItem = await CaptureResponse(context).ConfigureAwait(false);
             if (cachedItem != null)
@@ -100,7 +106,10 @@ namespace SmartDevelopment.Caching.OutputCaching
                         await _memoryCache.Add(cacheKey, cachedItem, options, tagsToApply).ConfigureAwait(false);
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    _logger.Exception(ex);
+                }
             }
         }
 
@@ -114,6 +123,10 @@ namespace SmartDevelopment.Caching.OutputCaching
                 context.Response.Body = buffer;
 
                 await _next.Invoke(context);
+            }
+            catch (Exception ex)
+            {
+                _logger.Exception(ex);
             }
             finally
             {

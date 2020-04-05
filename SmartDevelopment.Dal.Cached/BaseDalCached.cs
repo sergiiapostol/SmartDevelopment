@@ -34,12 +34,7 @@ namespace SmartDevelopment.Dal.Cached
         protected string GetCacheKey(ObjectId id)
         {
             return $"{CacheKey}_{id}";
-        }
-
-        public Task<TEntity> GetCachedAsync(ObjectId id)
-        {
-            return _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions);
-        }                               
+        }                            
 
         public Task<ITransaction> OpenTransaction()
         {
@@ -213,7 +208,7 @@ namespace SmartDevelopment.Dal.Cached
 
         public Task<TEntity> GetAsync(ObjectId id)
         {
-            return _dal.GetAsync(id);
+            return _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions);
         }
 
         public Task<List<TEntity>> GetAsync(PagingInfo pagingInfo, Expression<Func<TEntity, bool>> filter = null, SortingSettings<TEntity> orderBy = null)
