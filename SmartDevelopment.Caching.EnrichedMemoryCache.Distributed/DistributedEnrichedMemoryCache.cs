@@ -11,7 +11,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
     {
         private readonly IChannelSender<CacheReleaseEvent> _sender;
         private readonly IChannelReceiver<CacheReleaseEvent> _receiver;
-        private readonly IEnrichedMemoryCache _enrichedMemoryCache;
+        private readonly EnrichedMemoryCache _enrichedMemoryCache;
         private readonly ILogger _logger;
 
         public DistributedEnrichedMemoryCache(EnrichedMemoryCache enrichedMemoryCache,

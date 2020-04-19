@@ -77,6 +77,8 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.Configure<ResponseCachingSettings>(Configuration.GetSection("ResponseCachingSettings"));
             services.Configure<EnrichedMemoryCacheSettings>(Configuration.GetSection("EnrichedMemoryCacheSettings"));
             services.Configure<DistributedEnrichedMemoryCacheSettings>(Configuration.GetSection("DistributedEnrichedMemoryCacheSettings"));
+            services.Configure<DependencyByNameFilterSettings>(Configuration.GetSection("DependencyByNameFilterSettings"));
+            services.Configure<RequestsByNameFilterSettings>(Configuration.GetSection("RequestsByNameFilterSettings"));
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings
@@ -105,6 +107,7 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.AddApplicationInsightsTelemetry();
             services.AddApplicationInsightsTelemetryProcessor<RequestsBySynteticSourceFilter>();
             services.AddApplicationInsightsTelemetryProcessor<RequestsByNameFilter>();
+            services.AddApplicationInsightsTelemetryProcessor<DependencyByNameFilter>();
 
             AddConfiguration(services);
 

@@ -33,18 +33,18 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         {
             var entity = new TestEntity { Text = "1" };
             await _dal.InsertAsync(entity).ConfigureAwait(false);
-            entity = await _dal.GetCachedAsync(entity.Id).ConfigureAwait(false);
+            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
 
             await _dal.SetAsync(entity.Id, v => v.Text, "2").ConfigureAwait(false);
-            entity = await _dal.GetCachedAsync(entity.Id).ConfigureAwait(false);
+            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
 
             await _dal.SetAsync(entity.Id, 
                 new List<PropertyUpdate<TestEntity>> { new PropertyUpdate<TestEntity>(v=>v.Text, "3") }).ConfigureAwait(false);
-            entity = await _dal.GetCachedAsync(entity.Id).ConfigureAwait(false);
+            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
 
             entity.Text = "4";
             await _dal.UpdateAsync(entity.Id, entity).ConfigureAwait(false);
-            entity = await _dal.GetCachedAsync(entity.Id).ConfigureAwait(false);
+            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
 
             return Ok();
         }

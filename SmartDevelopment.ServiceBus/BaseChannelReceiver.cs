@@ -35,7 +35,7 @@ namespace SmartDevelopment.ServiceBus
             })
             {
                 AutoComplete = true,
-                MaxConcurrentCalls = 10
+                MaxConcurrentCalls = 1
             });
         }
     }

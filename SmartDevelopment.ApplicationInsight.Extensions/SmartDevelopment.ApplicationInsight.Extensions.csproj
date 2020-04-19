@@ -8,7 +8,7 @@
     <Product>SmartDevelopment.Helpers</Product>
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <Version>1.1.1</Version>
+    <Version>1.2.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
