@@ -208,7 +208,8 @@ namespace SmartDevelopment.Dal.Cached
 
         public Task<TEntity> GetAsync(ObjectId id)
         {
-            return _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions);
+            return _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions, 
+                new Dictionary<string, string> { { CacheKey, id.ToString()} });
         }
 
         public Task<List<TEntity>> GetAsync(PagingInfo pagingInfo, Expression<Func<TEntity, bool>> filter = null, SortingSettings<TEntity> orderBy = null)
