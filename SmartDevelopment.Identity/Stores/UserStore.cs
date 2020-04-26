@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -176,6 +177,28 @@ namespace SmartDevelopment.Identity.Stores
             var user = await _dal.GetAsync(token.UserId).ConfigureAwait(false);
             user.Tokens.Add(token);
             await UpdateAsync(user).ConfigureAwait(false);
+        }
+
+        public override async Task SetTokenAsync(TUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            var token = await FindTokenAsync(user, loginProvider, name, cancellationToken);
+            if (token == null)
+            {
+                token = CreateUserToken(user, loginProvider, name, value);
+                user.Tokens.Add(token);
+            }
+            else
+            {
+                token.Value = value;
+            }
         }
 
         protected override async Task RemoveUserTokenAsync(TUserToken token)
