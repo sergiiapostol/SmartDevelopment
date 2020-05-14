@@ -206,10 +206,15 @@ namespace SmartDevelopment.Dal.Cached
 
         #region Get
 
-        public Task<TEntity> GetAsync(ObjectId id)
+        public async Task<TEntity> GetAsync(ObjectId id)
         {
-            return _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions, 
-                new Dictionary<string, string> { { CacheKey, id.ToString()} });
+            var cachedEntity = await _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions, 
+                new Dictionary<string, string> { { CacheKey, id.ToString()} }).ConfigureAwait(false);
+
+            if (cachedEntity == null)
+                return await _dal.GetAsync(id).ConfigureAwait(false);
+
+            return cachedEntity;
         }
 
         public Task<List<TEntity>> GetAsync(PagingInfo pagingInfo, Expression<Func<TEntity, bool>> filter = null, SortingSettings<TEntity> orderBy = null)

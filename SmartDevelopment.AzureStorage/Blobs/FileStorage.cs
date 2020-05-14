@@ -12,7 +12,8 @@ namespace SmartDevelopment.AzureStorage.Blobs
     public interface IFileStorage
     {
         string ContainerName { get; }
-        Task<StorageItem> Save(Stream stream, string fileExtension = null, string contentType = null, IDictionary<string, string> metadata = null);
+        Task<StorageItem> Save(Stream stream, string fileExtension = null, string contentType = null, 
+            IDictionary<string, string> metadata = null, int? cacheDuration = null);
         Task<StorageItem> Get(Guid id);
         Task Remove(Guid id);
         Task Init();
@@ -47,7 +48,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
         }
 
         public async Task<StorageItem> Save(Stream stream, string fileExtension = null, string contentType = null,
-            IDictionary<string, string> metadata = null)
+            IDictionary<string, string> metadata = null, int? cacheDuration = null)
         {
             var id = Guid.NewGuid();
 
@@ -57,10 +58,14 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
             blob.Properties.ContentType = contentType ??
                 _contentTypeMappers?.Select(v => v.GetContentType(fileExtension)).FirstOrDefault(v => !string.IsNullOrEmpty(v));
-            blob.Properties.ContentDisposition = $"attachment; filename=\"{ id}{fileExtension}\"";
+            blob.Properties.ContentDisposition = $"attachment; filename=\"{ id}{fileExtension}\"";            
+
+            if (cacheDuration.HasValue)
+                blob.Properties.CacheControl = $"public, max-age={cacheDuration}";
+
             await blob.SetPropertiesAsync().ConfigureAwait(false);
 
-            metadata = metadata ?? new Dictionary<string, string>();
+            metadata ??= new Dictionary<string, string>();
             metadata["CreatedAt"] = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
             if(!string.IsNullOrWhiteSpace(fileExtension))
                 metadata["Extension"] = fileExtension;
