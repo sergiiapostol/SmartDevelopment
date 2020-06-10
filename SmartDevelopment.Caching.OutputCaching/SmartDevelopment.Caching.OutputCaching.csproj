@@ -8,7 +8,7 @@
     <Product>SmartDevelopment.Cache</Product>
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <Version>1.1.2</Version>
+    <Version>1.1.3</Version>
     <PackageId>SmartDevelopment.Caching.OutputCaching</PackageId>
   </PropertyGroup>
 

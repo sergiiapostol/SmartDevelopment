@@ -111,9 +111,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 {
                     v.UsageCounter += 1;
                     return v;
-                });
-
-            var newEntry = _memoryCache.CreateEntry(key);
+                });            
 
             if (tags?.Count > 0)
             {
@@ -134,8 +132,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 cacheOptions.RegisterPostEvictionCallback(PostEvictionCallback);
             }
 
-            newEntry.SetOptions(cacheOptions);
-            newEntry.SetValue(value);
+            _memoryCache.Set(key, value, cacheOptions);
         }
 
         public virtual Task Remove(string key)
