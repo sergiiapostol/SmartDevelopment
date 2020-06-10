@@ -103,7 +103,7 @@ namespace SmartDevelopment.Caching.OutputCaching
                         if (context.Items.TryGetValue(Consts.CachedObjectTags, out var tagsO) && tagsO is Dictionary<string, string> tags)
                             tagsToApply = tags;
 
-                        await _memoryCache.Add(cacheKey, cachedItem, options, tagsToApply).ConfigureAwait(false);
+                        _memoryCache.Add(cacheKey, cachedItem, options, tagsToApply);
                     }
                 }
                 catch (Exception ex)

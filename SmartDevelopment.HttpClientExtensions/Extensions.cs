@@ -169,12 +169,13 @@ namespace SmartDevelopment.HttpClientExtensions
                 {
                     StatusCode = response.StatusCode.ToString(),
                     ReasonPhrase = response.ReasonPhrase,
-                    Uri = response.RequestMessage.RequestUri.ToString()
+                    Uri = response.RequestMessage?.RequestUri?.ToString()
                 };
 
                 try
                 {
-                    exception.RawResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    if(response.Content != null)
+                        exception.RawResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 }
                 catch { }
 

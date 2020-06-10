@@ -83,7 +83,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         public TEntity Get<TEntity>(string key)
         {
             if (!_settings.IsEnabled)
-                return default(TEntity);
+                return default;
 
             var result =  _memoryCache.Get<TEntity>(key);
             if (result != null && !result.Equals(default(TEntity)))
@@ -100,9 +100,42 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             return result;
         }
 
-        public async Task Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions cacheOptions, Dictionary<string, string> tags = null)
+        public void Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions cacheOptions, Dictionary<string, string> tags = null)
         {
-            await GetOrAdd(key, () => Task.FromResult(value), cacheOptions, tags).ConfigureAwait(false);
+            if (!_settings.IsEnabled)
+                return;
+
+            _cacheKeyUsage.AddOrUpdate(key,
+                v => new CacheItemUsage { Type = typeof(TEntity), UsageCounter = 0 },
+                (k, v) =>
+                {
+                    v.UsageCounter += 1;
+                    return v;
+                });
+
+            var newEntry = _memoryCache.CreateEntry(key);
+
+            if (tags?.Count > 0)
+            {
+                var cancelationSource = new CancellationTokenSource();
+
+                foreach (var tag in tags)
+                {
+                    var sources = GetCancelationTokens(tag.Key, tag.Value);
+                    sources.TryAdd(key, cancelationSource);
+                }
+                var changeNotification = new ChangeNotification { Source = cancelationSource, Tags = tags };
+
+                cacheOptions.AddExpirationToken(new CancellationChangeToken(cancelationSource.Token));
+                cacheOptions.RegisterPostEvictionCallback(PostEvictionCallback, changeNotification);
+            }
+            else
+            {
+                cacheOptions.RegisterPostEvictionCallback(PostEvictionCallback);
+            }
+
+            newEntry.SetOptions(cacheOptions);
+            newEntry.SetValue(value);
         }
 
         public virtual Task Remove(string key)

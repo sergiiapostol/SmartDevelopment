@@ -12,7 +12,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
         TEntity Get<TEntity>(string key);
 
-        Task Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions options, Dictionary<string, string> tags = null);
+        void Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions options, Dictionary<string, string> tags = null);
 
         Task Remove(string key);
 

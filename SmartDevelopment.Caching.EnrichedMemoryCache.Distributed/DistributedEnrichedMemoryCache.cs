@@ -23,9 +23,9 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
             _logger = logger;
         }
 
-        public Task Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions options, Dictionary<string, string> tags = null)
+        public void Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions options, Dictionary<string, string> tags = null)
         {
-            return _enrichedMemoryCache.Add(key, value, options, tags);
+            _enrichedMemoryCache.Add(key, value, options, tags);
         }
 
         public TEntity Get<TEntity>(string key)

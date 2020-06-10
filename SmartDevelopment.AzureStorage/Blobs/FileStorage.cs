@@ -27,9 +27,12 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
         public string ContainerName { get; }
 
-        protected BaseFileStorage(ConnectionSettings connectionSettings, string containerName, IEnumerable<IContentTypeResolver> contentTypeMappers)
+        public int? CacheDuration { get; }
+
+        protected BaseFileStorage(ConnectionSettings connectionSettings, string containerName, IEnumerable<IContentTypeResolver> contentTypeMappers, int? cacheDuration = null)
         {
             ContainerName = containerName.ToLower();
+            CacheDuration = cacheDuration;
             var account = CloudStorageAccount.Parse(connectionSettings.ConnectionString);
             var client = account.CreateCloudBlobClient();
             Container = client.GetContainerReference(ContainerName);
@@ -60,8 +63,8 @@ namespace SmartDevelopment.AzureStorage.Blobs
                 _contentTypeMappers?.Select(v => v.GetContentType(fileExtension)).FirstOrDefault(v => !string.IsNullOrEmpty(v));
             blob.Properties.ContentDisposition = $"attachment; filename=\"{ id}{fileExtension}\"";            
 
-            if (cacheDuration.HasValue)
-                blob.Properties.CacheControl = $"public, max-age={cacheDuration}";
+            if ((cacheDuration ?? CacheDuration).HasValue)
+                blob.Properties.CacheControl = $"public, max-age={(cacheDuration ?? CacheDuration)}";
 
             await blob.SetPropertiesAsync().ConfigureAwait(false);
 
