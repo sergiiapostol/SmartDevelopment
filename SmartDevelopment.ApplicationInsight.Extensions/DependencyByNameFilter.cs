@@ -7,20 +7,21 @@ using System.Linq;
 
 namespace SmartDevelopment.ApplicationInsight.Extensions
 {
-    public class DependencyByNameFilterSettings
+    public class DependencyFilterSettings
     {
         public List<string> NamesToExclude { get; set; } = new List<string>();
+        public List<string> CommandsToExclude { get; set; } = new List<string>();
     }
     public class DependencyByNameFilter : ITelemetryProcessor
     {
         private ITelemetryProcessor Next { get; set; }
 
-        private DependencyByNameFilterSettings Settings { get; set; }
+        private DependencyFilterSettings Settings { get; set; }
 
-        public DependencyByNameFilter(ITelemetryProcessor next, IOptions<DependencyByNameFilterSettings> settings)
+        public DependencyByNameFilter(ITelemetryProcessor next, IOptions<DependencyFilterSettings> settings)
         {
             Next = next;
-            Settings = settings.Value ?? new DependencyByNameFilterSettings();
+            Settings = settings.Value ?? new DependencyFilterSettings();
         }
 
         public void Process(ITelemetry item)
@@ -37,9 +38,9 @@ namespace SmartDevelopment.ApplicationInsight.Extensions
                 try
                 {
                     var request = item as DependencyTelemetry;
-                    return !(request.Success ?? false) || !Settings.NamesToExclude.Any(v =>
-                        request.Name.Contains(v) ||
-                        request.Type.Contains(v));
+                    var excludedbyName = Settings.NamesToExclude.Any(v => request.Name.ToLowerInvariant().Contains(v.ToLowerInvariant()) || request.Type    .Contains(v.ToLowerInvariant()));
+                    var excludedByCommand = Settings.CommandsToExclude.Any(v => request.Data.ToLowerInvariant().Contains(v.ToLowerInvariant()));
+                    return !(excludedbyName || excludedByCommand) || !(request.Success ?? false);
                 }
                 catch { }
             }

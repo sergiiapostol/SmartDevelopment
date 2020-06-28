@@ -77,7 +77,7 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.Configure<ResponseCachingSettings>(Configuration.GetSection("ResponseCachingSettings"));
             services.Configure<EnrichedMemoryCacheSettings>(Configuration.GetSection("EnrichedMemoryCacheSettings"));
             services.Configure<DistributedEnrichedMemoryCacheSettings>(Configuration.GetSection("DistributedEnrichedMemoryCacheSettings"));
-            services.Configure<DependencyByNameFilterSettings>(Configuration.GetSection("DependencyByNameFilterSettings"));
+            services.Configure<DependencyFilterSettings>(Configuration.GetSection("DependencyByNameFilterSettings"));
             services.Configure<RequestsByNameFilterSettings>(Configuration.GetSection("RequestsByNameFilterSettings"));
             services.Configure<IdentityOptions>(options =>
             {

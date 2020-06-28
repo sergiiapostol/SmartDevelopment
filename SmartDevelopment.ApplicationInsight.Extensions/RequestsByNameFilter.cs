@@ -37,9 +37,11 @@ namespace SmartDevelopment.ApplicationInsight.Extensions
                 try
                 {
                     var request = item as RequestTelemetry;
-                    return !(request.Success ?? false) || !Settings.NamesToExclude.Any(v =>
-                        request.Name.Contains(v) ||
-                        request.Url.OriginalString.Contains(v));
+                    var excludedByName = Settings.NamesToExclude.Any(v =>
+                        request.Name.ToLowerInvariant().Contains(v.ToLowerInvariant()) ||
+                        request.Url.OriginalString.ToLowerInvariant().Contains(v.ToLowerInvariant()));
+
+                    return !excludedByName || !(request.Success ?? false);
                 }
                 catch { }
             }
