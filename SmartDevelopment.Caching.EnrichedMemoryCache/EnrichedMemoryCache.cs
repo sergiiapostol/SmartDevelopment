@@ -191,7 +191,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             }
 
             _cacheKeyUsage.TryRemove(key, out var usageCounter);
-            _logger.Information("Cache item evicted", new Dictionary<string, string> {
+            _logger.Debug("Cache item evicted", new Dictionary<string, string> {
                 {"Key", key },
                 {"Usage", usageCounter.UsageCounter.ToString() },
                 { "Entity", usageCounter.Type.Name},
