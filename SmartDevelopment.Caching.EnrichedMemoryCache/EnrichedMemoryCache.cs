@@ -43,7 +43,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         public Task<TEntity> GetOrAdd<TEntity>(string key, Func<Task<TEntity>> valueGetter, 
             MemoryCacheEntryOptions cacheOptions, Dictionary<string, string> tags = null)
         {
-            if (!_settings.IsEnabled)
+            if (!_settings.IsEnabled || string.IsNullOrWhiteSpace(key))
                 return valueGetter();
 
             _cacheKeyUsage.AddOrUpdate(key,
@@ -82,7 +82,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
         public TEntity Get<TEntity>(string key)
         {
-            if (!_settings.IsEnabled)
+            if (!_settings.IsEnabled || string.IsNullOrWhiteSpace(key))
                 return default;
 
             var result =  _memoryCache.Get<TEntity>(key);
@@ -102,7 +102,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
         public void Add<TEntity>(string key, TEntity value, MemoryCacheEntryOptions cacheOptions, Dictionary<string, string> tags = null)
         {
-            if (!_settings.IsEnabled)
+            if (!_settings.IsEnabled || string.IsNullOrWhiteSpace(key))
                 return;
 
             _cacheKeyUsage.AddOrUpdate(key,
@@ -206,13 +206,13 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 try
                 {
                     var usage = new Dictionary<string, CacheItemUsage>(memoryCahceInstance._cacheKeyUsage)
-                        .GroupBy(v => v.Value.Type)
-                        .ToDictionary(v => v.Key.Name, v => $"Items: {v.Count()}, TotalUsage: {v.Sum(v => v.Value.UsageCounter)}");
+                        .GroupBy(v => v.Value.Type.FullName)
+                        .ToDictionary(v => v.Key, v => $"Items: {v.Count()}, TotalUsage: {v.Sum(v => v.Value.UsageCounter)}");
 
                     memoryCahceInstance._logger.Information("Cache usage", usage);
                 }catch(Exception ex)
                 {
-                    memoryCahceInstance._logger.Exception(ex);
+                    memoryCahceInstance._logger.Debug(ex);
                 }
             }
         }
