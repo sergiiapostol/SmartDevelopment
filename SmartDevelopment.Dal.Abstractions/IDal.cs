@@ -21,16 +21,16 @@ namespace SmartDevelopment.Dal.Abstractions
         Task<long> UpdateAsync(IList<TEntity> entities);
 
         Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
-            Expression<Func<TEntity, TProperty>> property, TProperty value);
+            Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false);
 
         Task<long> SetAsync<TProperty>(ObjectId id,
-            Expression<Func<TEntity, TProperty>> property, TProperty value);
+            Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false);
 
         Task<long> SetAsync(Expression<Func<TEntity, bool>> filter,
-            List<PropertyUpdate<TEntity>> updates);
+            List<PropertyUpdate<TEntity>> updates, bool upsert = false);
 
         Task<long> SetAsync(ObjectId id,
-            List<PropertyUpdate<TEntity>> updates);
+            List<PropertyUpdate<TEntity>> updates, bool upsert = false);
 
         Task<long> IncrementProperty<TProperty>(Expression<Func<TEntity, bool>> filter,
             Expression<Func<TEntity, TProperty>> property, TProperty value);

@@ -105,14 +105,14 @@ namespace SmartDevelopment.Dal.Cached
             return result;
         }
 
-        public Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TProperty>> property, TProperty value)
+        public Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false)
         {
-            return _dal.SetAsync(filter, property, value);
+            return _dal.SetAsync(filter, property, value, upsert);
         }
 
-        public async Task<long> SetAsync<TProperty>(ObjectId id, Expression<Func<TEntity, TProperty>> property, TProperty value)
+        public async Task<long> SetAsync<TProperty>(ObjectId id, Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false)
         {
-            var result = await _dal.SetAsync(id, property, value).ConfigureAwait(false);
+            var result = await _dal.SetAsync(id, property, value, upsert).ConfigureAwait(false);
             try
             {
                 await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
@@ -125,14 +125,14 @@ namespace SmartDevelopment.Dal.Cached
             return result;
         }
 
-        public Task<long> SetAsync(Expression<Func<TEntity, bool>> filter, List<PropertyUpdate<TEntity>> updates)
+        public Task<long> SetAsync(Expression<Func<TEntity, bool>> filter, List<PropertyUpdate<TEntity>> updates, bool upsert = false)
         {
-            return _dal.SetAsync(filter, updates);
+            return _dal.SetAsync(filter, updates, upsert);
         }
 
-        public async Task<long> SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates)
+        public async Task<long> SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates, bool upsert = false)
         {
-            var result = await _dal.SetAsync(id, updates).ConfigureAwait(false);
+            var result = await _dal.SetAsync(id, updates, upsert).ConfigureAwait(false);
             try
             {
                 await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);

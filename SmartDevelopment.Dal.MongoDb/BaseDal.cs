@@ -204,15 +204,15 @@ namespace SmartDevelopment.Dal.MongoDb
         }
 
         public Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
-            Expression<Func<TEntity, TProperty>> property, TProperty value)
+            Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false)
         {
-            return SetAsync(Filter.Where(filter), Update.Set(property, value));
+            return SetAsync(Filter.Where(filter), Update.Set(property, value), new UpdateOptions { IsUpsert = upsert} );
         }
 
         public Task<long> SetAsync<TProperty>(ObjectId id,
-            Expression<Func<TEntity, TProperty>> property, TProperty value)
+            Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false)
         {
-            return SetAsync(id, Update.Set(property, value));
+            return SetAsync(id, Update.Set(property, value), new UpdateOptions { IsUpsert = upsert });
         }
 
         private UpdateDefinition<TEntity> CreateUpdateDefinition(List<PropertyUpdate<TEntity>> updates)
@@ -229,20 +229,20 @@ namespace SmartDevelopment.Dal.MongoDb
             return sets;
         }
 
-        public Task<long> SetAsync(Expression<Func<TEntity, bool>> filter, List<PropertyUpdate<TEntity>> updates)
+        public Task<long> SetAsync(Expression<Func<TEntity, bool>> filter, List<PropertyUpdate<TEntity>> updates, bool upsert = false)
         {
             if (updates?.Count < 1)
                 return Task.FromResult(0L);
 
-            return SetAsync(Filter.Where(filter), CreateUpdateDefinition(updates));
+            return SetAsync(Filter.Where(filter), CreateUpdateDefinition(updates), new UpdateOptions { IsUpsert = upsert });
         }
 
-        public Task<long> SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates)
+        public Task<long> SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates, bool upsert = false)
         {
             if (updates?.Count < 1)
                 return Task.FromResult(0L);
 
-            return SetAsync(id, CreateUpdateDefinition(updates));
+            return SetAsync(id, CreateUpdateDefinition(updates), new UpdateOptions { IsUpsert = upsert });
         }
 
         protected async Task<long> SetAsync(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update,
