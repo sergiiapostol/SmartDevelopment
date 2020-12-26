@@ -40,7 +40,7 @@ namespace SmartDevelopment.HttpClientExtensions
             }
 
             using var response = await client.SendAsync(request).ConfigureAwait(false);
-            return await Deserialize<TResult>(response, jsonSerializer).ConfigureAwait(false);
+            return await response.Deserialize<TResult>(jsonSerializer).ConfigureAwait(false);
         }
 
         private static Task<TResult> SendAsync<TModel, TResult>(HttpClient client, string url, TModel model, 
@@ -129,7 +129,7 @@ namespace SmartDevelopment.HttpClientExtensions
 
         private static readonly JsonSerializer _serializer = new JsonSerializer();
 
-        private static async Task<TObject> Deserialize<TObject>(HttpResponseMessage response, JsonSerializer jsonSerializer = null) where TObject : class
+        public static async Task<TObject> Deserialize<TObject>(this HttpResponseMessage response, JsonSerializer jsonSerializer = null) where TObject : class
         {
             jsonSerializer ??= _serializer;
 
