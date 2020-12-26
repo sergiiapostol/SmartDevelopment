@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <Version>1.5.1</Version>
+    <Version>5.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
