@@ -60,7 +60,7 @@ namespace SmartDevelopment.DependencyTracking
                 _stopwatch.Stop();
                 Duration = duration ?? _stopwatch.Elapsed;
                 _stopwatch = null;
-                IsSucess = status;                
+                IsSucess = status;
 
                 return this;
             }

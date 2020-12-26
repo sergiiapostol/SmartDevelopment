@@ -17,7 +17,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
         }
 
         public override Task ProcessMessage(CacheReleaseEvent message)
-        { 
+        {
             return string.IsNullOrWhiteSpace(message.Key) ? _enrichedMemoryCache.Remove(message.Tags) : _enrichedMemoryCache.Remove(message.Key);
         }
     }

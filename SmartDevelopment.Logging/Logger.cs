@@ -1,9 +1,9 @@
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace SmartDevelopment.Logging
@@ -106,10 +106,10 @@ namespace SmartDevelopment.Logging
             _logger.LogDebug(ex, ex.Message);
         }
 
-        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> MessageGetter => 
+        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> MessageGetter =>
             (state, _) => state.FirstOrDefault(v => v.Key.Equals(MessageKey)).Value?.ToString();
 
-        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> ExceptionMessageGetter => 
+        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> ExceptionMessageGetter =>
             (_, exception) => exception.Message;
     }
 }

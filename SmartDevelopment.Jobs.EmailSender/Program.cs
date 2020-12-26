@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SendGrid;
+using SmartDevelopment.Emailer.SendGrid;
 using SmartDevelopment.Jobs.Base;
 using SmartDevelopment.Logging;
-using SmartDevelopment.Emailer.SendGrid;
 using System;
 
 namespace SmartDevelopment.Jobs.EmailSender

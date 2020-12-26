@@ -19,7 +19,7 @@ namespace SmartDevelopment.Dal.Abstractions.Models
 
         public Expression<Func<TEntity, bool>> Filter { get; set; }
 
-        public string Search { get;}
+        public string Search { get; }
 
         public string LanguageCode { get; }
 

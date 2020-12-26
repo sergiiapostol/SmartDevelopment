@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using SmartDevelopment.Dal.Abstractions;
 
 namespace SmartDevelopment.Dal.Abstractions.Models
 {

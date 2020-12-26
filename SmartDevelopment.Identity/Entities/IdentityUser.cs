@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
-using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson.Serialization.Attributes;
 using SmartDevelopment.Dal.Abstractions;
 using System;
-using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 
 namespace SmartDevelopment.Identity.Entities
 {
     [BsonIgnoreExtraElements]
     public class IdentityUser : IdentityUser<ObjectId>, IDbEntity
     {
-		public List<string> Roles { get; set; } = new List<string>();
+        public List<string> Roles { get; set; } = new List<string>();
 
         public List<IdentityUserLogin<ObjectId>> Logins { get; set; } = new List<IdentityUserLogin<ObjectId>>();
 

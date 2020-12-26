@@ -45,7 +45,7 @@ namespace SmartDevelopment.ServiceBus
         }
     }
 
-    public class BaseQueueSender<TMessage> : IChannelSender<TMessage>, IAsyncDisposable 
+    public class BaseQueueSender<TMessage> : IChannelSender<TMessage>, IAsyncDisposable
         where TMessage : class
     {
         private readonly IQueueClient _client;
@@ -75,7 +75,7 @@ namespace SmartDevelopment.ServiceBus
         public async Task Init()
         {
             var managementClient = new ManagementClient(_connectionSettings.ConnectionString);
-            if(!await managementClient.QueueExistsAsync(ChannelName).ConfigureAwait(false))
+            if (!await managementClient.QueueExistsAsync(ChannelName).ConfigureAwait(false))
             {
                 await managementClient.CreateQueueAsync(new QueueDescription(ChannelName)
                 {

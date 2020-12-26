@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartDevelopment.Logging;
+using System;
 
 namespace SmartDevelopment.SampleApp.AspCore.Controllers
 {

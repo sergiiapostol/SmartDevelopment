@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.WebJobs.Logging.ApplicationInsights;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

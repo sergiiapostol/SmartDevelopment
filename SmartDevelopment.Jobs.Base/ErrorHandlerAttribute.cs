@@ -17,7 +17,7 @@ namespace SmartDevelopment.Jobs.Base
 
                 exception = exception.InnerException;
             } while (exception != null);
-            
+
             return Task.CompletedTask;
         }
     }

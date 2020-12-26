@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,23 +12,24 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using SmartDevelopment.ApplicationInsight.Extensions;
-using SmartDevelopment.Caching.OutputCaching;
 using SmartDevelopment.AzureStorage;
 using SmartDevelopment.AzureStorage.Blobs;
+using SmartDevelopment.Caching.EnrichedMemoryCache;
+using SmartDevelopment.Caching.EnrichedMemoryCache.Distributed;
+using SmartDevelopment.Caching.OutputCaching;
+using SmartDevelopment.Dal.Cached;
 using SmartDevelopment.Dal.MongoDb;
 using SmartDevelopment.DependencyTracking;
 using SmartDevelopment.DependencyTracking.ApplicationInsights;
 using SmartDevelopment.DependencyTracking.MongoDb;
 using SmartDevelopment.Identity;
 using SmartDevelopment.Logging;
-using SmartDevelopment.SampleApp.AspCore.Configuration;
 using SmartDevelopment.Messaging;
+using SmartDevelopment.SampleApp.AspCore.Configuration;
 using SmartDevelopment.SampleApp.AspCore.Controllers;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using SmartDevelopment.Caching.EnrichedMemoryCache;
-using SmartDevelopment.Caching.EnrichedMemoryCache.Distributed;
-using SmartDevelopment.Dal.Cached;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace SmartDevelopment.SampleApp.AspCore
 {
@@ -102,7 +102,7 @@ namespace SmartDevelopment.SampleApp.AspCore
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry();
             services.AddApplicationInsightsTelemetryProcessor<RequestsBySynteticSourceFilter>();
@@ -118,7 +118,7 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.AddMemoryCache(v => { v.CompactionPercentage = 0.9; });
             services.AddDistributedEnrichedMemoryCacheInitializer();
 
-            services.AddSingleton<OutputCacheManager>();            
+            services.AddSingleton<OutputCacheManager>();
 
             services.AddAuthentication(options =>
             {
@@ -126,22 +126,21 @@ namespace SmartDevelopment.SampleApp.AspCore
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer();
 
-            // Add framework services.
-            services.AddMvc(options =>
+            services
+                .AddControllers(options =>
             {
-                options.EnableEndpointRouting = false;
                 options.CacheProfiles.Add("Default",
                     new CacheProfile
                     {
                         Duration = 3600,
                         Location = ResponseCacheLocation.Any
                     });
-            }).AddNewtonsoftJson(options =>
+            })
+                .AddJsonOptions(options =>
             {
-                options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate;
-                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            }).AddControllersAsServices();
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault;
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
 
             services.AddSwaggerGen(c =>
             {
@@ -174,12 +173,13 @@ namespace SmartDevelopment.SampleApp.AspCore
                         }
                     });
             });
+            
             services.AddLogger(Configuration.GetSection("LoggerSettings").Get<LoggerSettings>());
 
             services.AddDependencyTrackingWithApplicationInsights(Configuration.GetSection("DependencySettings").Get<DependencySettings>());
 
             services.AddProfiledMongoDb(
-                new Dal.MongoDb.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("MongoDb") }, 
+                new Dal.MongoDb.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("MongoDb") },
                 Configuration.GetSection("MongoDbProfilingSettings").Get<ProfilingSettings>());
 
             services
@@ -192,9 +192,10 @@ namespace SmartDevelopment.SampleApp.AspCore
             services.AddBlobsInitializer(new AzureStorage.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("AzureStorage") });
             services.AddBlobQueuesInitializer(new AzureStorage.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("AzureStorage") });
             services.AddServiceBusQueuesInitializer(new ServiceBus.ConnectionSettings { ConnectionString = Configuration.GetConnectionString("ServiceBus") });
+        }
 
-            var builder = new ContainerBuilder();
-            builder.Populate(services);
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             builder.Register(_ => Configuration).As<IConfiguration>().SingleInstance();
             builder.RegisterType<TestQueueSender>().AsSelf().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<TestQeueuReceiver>().AsSelf().AsImplementedInterfaces().SingleInstance();
@@ -202,10 +203,6 @@ namespace SmartDevelopment.SampleApp.AspCore
             builder.RegisterType<TestTopicReceiver>().AsSelf().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<TestDal>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<TestDalCached>().As<IDalCached<TestEntity>>().SingleInstance();
-            var autofaccontainer = builder.Build();
-
-            // Create the IServiceProvider based on the container.
-            return new AutofacServiceProvider(autofaccontainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -220,13 +217,6 @@ namespace SmartDevelopment.SampleApp.AspCore
 
             app.UseMiddleware<CachingMiddleware>();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "api/{controller}/{action}/{id?}");
-            }).UseResponseCaching().UseResponseCompression();
-
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -236,6 +226,14 @@ namespace SmartDevelopment.SampleApp.AspCore
                 c.DisplayRequestDuration();
                 c.EnableFilter();
             });
+
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            })
+            .UseResponseCaching()
+            .UseResponseCompression();
 
             ApplicationLogger = app.ApplicationServices.GetService<Logging.ILogger<Startup>>();
 
@@ -254,7 +252,7 @@ namespace SmartDevelopment.SampleApp.AspCore
                 var blobs = app.ApplicationServices.GetService<BlobsInitializator>();
                 await blobs.Init().ConfigureAwait(false);
 
-                var queues = app.ApplicationServices.GetService<ChannelsInitializator>();                
+                var queues = app.ApplicationServices.GetService<ChannelsInitializator>();
                 await queues.Init().ConfigureAwait(false);
             });
         }

@@ -4,7 +4,8 @@ namespace SmartDevelopment.HttpClientExtensions
 {
     public class HttpRequestException : Exception
     {
-        public HttpRequestException()         {
+        public HttpRequestException()
+        {
         }
 
         public HttpRequestException(string message) : base(message)

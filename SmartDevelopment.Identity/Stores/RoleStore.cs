@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
+using SmartDevelopment.Dal.Abstractions;
+using SmartDevelopment.Dal.Abstractions.Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using MongoDB.Bson;
-using SmartDevelopment.Dal.Abstractions;
-using SmartDevelopment.Dal.Abstractions.Models;
 
 namespace SmartDevelopment.Identity.Stores
 {
@@ -20,7 +20,7 @@ namespace SmartDevelopment.Identity.Stores
         public override IQueryable<TRole> Roles => _dal.AsQueryable();
 
         public RoleStore(IDal<TRole> dal, IdentityErrorDescriber describer)
-            :base(describer)
+            : base(describer)
         {
             _dal = dal;
         }

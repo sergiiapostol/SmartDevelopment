@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using SmartDevelopment.Dal.Abstractions;
 using SmartDevelopment.Dal.MongoDb;
 using SmartDevelopment.Identity.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SmartDevelopment.Identity.Dals
 {

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartDevelopment.Caching.OutputCaching;
+using System.Collections.Generic;
 
 namespace SmartDevelopment.SampleApp.AspCore.Controllers
 {
@@ -21,7 +21,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         [OutputCache(false, SlidingDurationInSec = 500)]
         [HttpGet, Route("Cache")]
         public object CacheCreate()
-        {            
+        {
             _outputCacheManager.TagCache(ControllerContext.HttpContext, new Dictionary<string, string> { { "TagKey", "TagValue" } });
 
             return null;

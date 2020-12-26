@@ -4,8 +4,8 @@ using MongoDB.Bson;
 using SmartDevelopment.Dal.Abstractions;
 using SmartDevelopment.Identity.Dals;
 using SmartDevelopment.Identity.Stores;
-using IdentityUser = SmartDevelopment.Identity.Entities.IdentityUser;
 using IdentityRole = SmartDevelopment.Identity.Entities.IdentityRole;
+using IdentityUser = SmartDevelopment.Identity.Entities.IdentityUser;
 
 namespace SmartDevelopment.Identity
 {

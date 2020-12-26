@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartDevelopment.Logging;
 using SmartDevelopment.ServiceBus;
+using System;
+using System.Threading.Tasks;
 
 namespace SmartDevelopment.SampleApp.AspCore.Controllers
 {
@@ -58,7 +58,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
     {
         private readonly ILogger _logger;
 
-        public TestQeueuReceiver(ConnectionSettings connectionSettings, ILogger<TestQeueuReceiver> logger) : 
+        public TestQeueuReceiver(ConnectionSettings connectionSettings, ILogger<TestQeueuReceiver> logger) :
             base(connectionSettings, "TestQueue", logger)
         {
             _logger = logger;

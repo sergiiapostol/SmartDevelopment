@@ -34,7 +34,7 @@ namespace SmartDevelopment.Dal.Cached
         protected string GetCacheKey(ObjectId id)
         {
             return $"{CacheKey}_{id}";
-        }                            
+        }
 
         public Task<ITransaction> OpenTransaction()
         {
@@ -208,8 +208,8 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<TEntity> GetAsync(ObjectId id)
         {
-            var cachedEntity = await _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions, 
-                new Dictionary<string, string> { { CacheKey, id.ToString()} }).ConfigureAwait(false);
+            var cachedEntity = await _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions,
+                new Dictionary<string, string> { { CacheKey, id.ToString() } }).ConfigureAwait(false);
 
             if (cachedEntity == null)
                 return await _dal.GetAsync(id).ConfigureAwait(false);

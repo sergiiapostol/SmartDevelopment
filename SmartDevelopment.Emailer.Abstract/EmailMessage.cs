@@ -39,7 +39,7 @@ namespace SmartDevelopment.Emailer.Abstract
     public sealed class TemplatedEmailMessage : EmailMessage
     {
         public TemplatedEmailMessage(string from, string to, string templateId, object templateData)
-            :base(from, to)
+            : base(from, to)
         {
             TemplateId = templateId;
             TemplateData = TemplateData = JsonSerializer.Serialize(templateData);

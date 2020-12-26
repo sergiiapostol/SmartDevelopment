@@ -11,7 +11,7 @@ namespace SmartDevelopment.Dal.Abstractions.Models
             Items = new List<SortingItem>();
         }
 
-        public SortingSettings(SortingItem sorting):this()
+        public SortingSettings(SortingItem sorting) : this()
         {
             Items.Add(sorting);
         }
@@ -47,7 +47,7 @@ namespace SmartDevelopment.Dal.Abstractions.Models
 
             public bool Asc { get; }
 
-            public Expression<Func<TEntity, object>> Expression { get;}
+            public Expression<Func<TEntity, object>> Expression { get; }
         }
     }
 }

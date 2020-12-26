@@ -20,10 +20,10 @@ namespace SmartDevelopment.Caching.OutputCaching
         public int SlidingDurationInSec { get; set; }
 
         public virtual Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-        {            
+        {
             context.HttpContext.Items[Consts.IsCachebleKey] = IsCachable;
             context.HttpContext.Items[Consts.IsUserSpecificKey] = _isUserSpecific;
-            if(DurationInSec > 0)
+            if (DurationInSec > 0)
                 context.HttpContext.Items[Consts.DurationKey] = DurationInSec;
             if (SlidingDurationInSec > 0)
                 context.HttpContext.Items[Consts.SlidingDurationKey] = SlidingDurationInSec;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
@@ -11,6 +8,9 @@ using SmartDevelopment.Dal.Abstractions.Models;
 using SmartDevelopment.Dal.Cached;
 using SmartDevelopment.Dal.MongoDb;
 using SmartDevelopment.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SmartDevelopment.SampleApp.AspCore.Controllers
 {
@@ -38,8 +38,8 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
             await _dal.SetAsync(entity.Id, v => v.Text, "2").ConfigureAwait(false);
             entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
 
-            await _dal.SetAsync(entity.Id, 
-                new List<PropertyUpdate<TestEntity>> { new PropertyUpdate<TestEntity>(v=>v.Text, "3") }).ConfigureAwait(false);
+            await _dal.SetAsync(entity.Id,
+                new List<PropertyUpdate<TestEntity>> { new PropertyUpdate<TestEntity>(v => v.Text, "3") }).ConfigureAwait(false);
             entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
 
             entity.Text = "4";

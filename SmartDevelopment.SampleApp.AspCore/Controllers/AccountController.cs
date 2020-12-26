@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
 using SmartDevelopment.SampleApp.AspCore.Configuration;
 using SmartDevelopment.SampleApp.AspCore.Models;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using IdentityUser = SmartDevelopment.Identity.Entities.IdentityUser;
 
 namespace SmartDevelopment.SampleApp.AspCore.Controllers
@@ -37,7 +37,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
 
         [HttpPost, Route("RegisterGuest")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register([FromBody]RegistrationModel model)
+        public async Task<IActionResult> Register([FromBody] RegistrationModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -63,7 +63,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         [HttpPost, Route("Token")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(TokenResult), 200)]
-        public async Task<IActionResult> Post([FromBody]TokenInput model)
+        public async Task<IActionResult> Post([FromBody] TokenInput model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

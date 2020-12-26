@@ -23,9 +23,9 @@ namespace SmartDevelopment.DependencyTracking.ApplicationInsights
                 Timestamp = item.StartTime,
                 Type = item.Type
             };
-            
+
             if (item.Metrics?.Count > 0)
-                foreach(var metric in item.Metrics)
+                foreach (var metric in item.Metrics)
                 {
                     dependency.Metrics.Add(metric.Key, metric.Value);
                 }
@@ -36,7 +36,7 @@ namespace SmartDevelopment.DependencyTracking.ApplicationInsights
                     dependency.Properties.Add(prop.Key, prop.Value);
                 }
 
-            _telemetryClient.TrackDependency(dependency);            
+            _telemetryClient.TrackDependency(dependency);
         }
     }
 }

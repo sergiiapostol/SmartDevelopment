@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using SmartDevelopment.Dal.Abstractions;
+using System;
+using System.Collections.Generic;
 
 namespace SmartDevelopment.Identity.Entities
 {

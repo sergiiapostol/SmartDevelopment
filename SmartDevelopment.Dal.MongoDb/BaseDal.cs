@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SmartDevelopment.Dal.Abstractions;
 using SmartDevelopment.Dal.Abstractions.Exceptions;
 using SmartDevelopment.Dal.Abstractions.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SmartDevelopment.Dal.MongoDb
 {
@@ -77,7 +77,7 @@ namespace SmartDevelopment.Dal.MongoDb
             public Task Commit()
             {
                 return _session.CommitTransactionAsync();
-            }            
+            }
 
             public Task Rollback()
             {
@@ -206,7 +206,7 @@ namespace SmartDevelopment.Dal.MongoDb
         public Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
             Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false)
         {
-            return SetAsync(Filter.Where(filter), Update.Set(property, value), new UpdateOptions { IsUpsert = upsert} );
+            return SetAsync(Filter.Where(filter), Update.Set(property, value), new UpdateOptions { IsUpsert = upsert });
         }
 
         public Task<long> SetAsync<TProperty>(ObjectId id,

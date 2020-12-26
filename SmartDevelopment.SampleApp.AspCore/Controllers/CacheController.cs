@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SmartDevelopment.Caching.EnrichedMemoryCache;
+using SmartDevelopment.Caching.OutputCaching;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using SmartDevelopment.Caching.OutputCaching;
-using SmartDevelopment.Caching.EnrichedMemoryCache;
 
 namespace SmartDevelopment.SampleApp.AspCore.Controllers
 {
@@ -24,10 +24,10 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         [OutputCache(false, SlidingDurationInSec = 500)]
         [HttpGet, Route("Cache")]
         public async Task<ActionResult> CacheCreate()
-        {            
+        {
             await _enrichedMemoryCache.GetOrAdd("TestValue1", () => Task.FromResult(1), new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { },
                 new Dictionary<string, string> { { "TagKey1", "TagValue" } });
-            
+
             await _enrichedMemoryCache.GetOrAdd("TestValue2", () => Task.FromResult(2), new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { },
                 new Dictionary<string, string> { { "TagKey1", "TagValue" } });
 
@@ -50,7 +50,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         {
             var cacheStatus = _enrichedMemoryCache.GetUsage();
             var tokens = _enrichedMemoryCache.GetCancelationTokens();
-            return Ok(new { Usage = cacheStatus.ToDictionary(v=>v.Key, v=>$"Type: {v.Value.Type.Name}, Cound: {v.Value.UsageCounter}"), Tokens = tokens});
+            return Ok(new { Usage = cacheStatus.ToDictionary(v => v.Key, v => $"Type: {v.Value.Type.Name}, Cound: {v.Value.UsageCounter}"), Tokens = tokens });
         }
     }
 }

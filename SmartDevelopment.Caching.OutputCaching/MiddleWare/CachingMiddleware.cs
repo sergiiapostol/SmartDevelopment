@@ -19,7 +19,7 @@ namespace SmartDevelopment.Caching.OutputCaching
         private readonly ResponseCachingSettings _settings;
         private readonly ILogger<CachingMiddleware> _logger;
 
-        public CachingMiddleware(RequestDelegate next, IEnrichedMemoryCache memoryCache, 
+        public CachingMiddleware(RequestDelegate next, IEnrichedMemoryCache memoryCache,
             IOptions<ResponseCachingSettings> settings, ILogger<CachingMiddleware> logger)
         {
             _next = next;
@@ -65,7 +65,8 @@ namespace SmartDevelopment.Caching.OutputCaching
                     return;
                 }
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 _logger.Exception(ex);
             }
 

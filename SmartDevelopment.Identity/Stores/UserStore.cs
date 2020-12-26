@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
+using SmartDevelopment.Dal.Abstractions;
+using SmartDevelopment.Dal.Abstractions.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using MongoDB.Bson;
-using SmartDevelopment.Dal.Abstractions;
-using SmartDevelopment.Dal.Abstractions.Models;
 using IdentityRole = SmartDevelopment.Identity.Entities.IdentityRole;
 using IdentityUser = SmartDevelopment.Identity.Entities.IdentityUser;
 
@@ -24,7 +24,7 @@ namespace SmartDevelopment.Identity.Stores
         where TRoleClaim : IdentityRoleClaim<ObjectId>, new()
 
     {
-	    private readonly IDal<TUser> _dal;
+        private readonly IDal<TUser> _dal;
 
         private readonly IDal<TRole> _rolesDal;
 
@@ -32,8 +32,8 @@ namespace SmartDevelopment.Identity.Stores
 
         public UserStore(IDal<TUser> dal, IDal<TRole> rolesDal, IdentityErrorDescriber describer) :
             base(describer)
-	    {
-	        _dal = dal;
+        {
+            _dal = dal;
             _rolesDal = rolesDal;
         }
 
@@ -145,7 +145,7 @@ namespace SmartDevelopment.Identity.Stores
 
         public override Task RemoveLoginAsync(TUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default(CancellationToken))
         {
-            user.Logins.RemoveAll(v=>v.LoginProvider == loginProvider && v.ProviderKey == providerKey);
+            user.Logins.RemoveAll(v => v.LoginProvider == loginProvider && v.ProviderKey == providerKey);
             return Task.CompletedTask;
         }
 
@@ -169,7 +169,7 @@ namespace SmartDevelopment.Identity.Stores
 
         protected override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
-            return Task.FromResult((TUserToken)user.Tokens.Find(v=>v.LoginProvider == loginProvider && v.Name == name));
+            return Task.FromResult((TUserToken)user.Tokens.Find(v => v.LoginProvider == loginProvider && v.Name == name));
         }
 
         protected override async Task AddUserTokenAsync(TUserToken token)

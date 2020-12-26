@@ -1,8 +1,8 @@
-using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using System;
 
 namespace SmartDevelopment.Dal.MongoDb
 {
@@ -42,7 +42,7 @@ namespace SmartDevelopment.Dal.MongoDb
                         var client = _clientFactory.GetClient(connectionString);
 
                         _database = client.GetDatabase(connectionString.DatabaseName,
-                            new MongoDatabaseSettings {GuidRepresentation = GuidRepresentation.CSharpLegacy});
+                            new MongoDatabaseSettings { GuidRepresentation = GuidRepresentation.CSharpLegacy });
                     }
                 }
             }

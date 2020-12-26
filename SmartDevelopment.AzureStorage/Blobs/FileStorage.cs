@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Azure.Storage.Blobs;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure.Storage.Blobs;
 
 namespace SmartDevelopment.AzureStorage.Blobs
 {
     public interface IFileStorage
     {
         string ContainerName { get; }
-        Task<StorageItem> Save(Stream stream, string fileExtension = null, string contentType = null, 
+        Task<StorageItem> Save(Stream stream, string fileExtension = null, string contentType = null,
             IDictionary<string, string> metadata = null, int? cacheDuration = null);
         Task<StorageItem> Get(Guid id);
         Task Remove(Guid id);
@@ -59,15 +59,15 @@ namespace SmartDevelopment.AzureStorage.Blobs
             contentType ??= _contentTypeMappers?.Select(v => v.GetContentType(fileExtension)).FirstOrDefault(v => !string.IsNullOrEmpty(v));
             if (!string.IsNullOrEmpty(contentType))
                 headers.ContentType = contentType;
-            if(!string.IsNullOrEmpty(fileExtension))
+            if (!string.IsNullOrEmpty(fileExtension))
                 headers.ContentDisposition = $"attachment; filename=\"{ id}{fileExtension}\"";
-            if(cacheDuration.HasValue)
+            if (cacheDuration.HasValue)
                 headers.CacheControl = $"public, max-age={cacheDuration ?? CacheDuration}";
-            var headersTask = blob.SetHttpHeadersAsync(headers);            
-            
+            var headersTask = blob.SetHttpHeadersAsync(headers);
+
             metadata ??= new Dictionary<string, string>();
             metadata["CreatedAt"] = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
-            if(!string.IsNullOrWhiteSpace(fileExtension))
+            if (!string.IsNullOrWhiteSpace(fileExtension))
                 metadata["Extension"] = fileExtension;
             var metadataTask = blob.SetMetadataAsync(metadata);
 
@@ -78,7 +78,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
         public async Task<StorageItem> Get(Guid id)
         {
-            var blobReference = Container.GetBlobClient(id.ToString());            
+            var blobReference = Container.GetBlobClient(id.ToString());
             var blob = await blobReference.DownloadAsync();
             if (blob?.Value == null)
                 return null;

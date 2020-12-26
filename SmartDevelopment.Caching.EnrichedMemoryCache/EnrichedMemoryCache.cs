@@ -27,7 +27,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
         private Timer _timer;
 
-        protected EnrichedMemoryCache(ILogger logger, IMemoryCache memoryCache, IOptions<EnrichedMemoryCacheSettings> settings) 
+        protected EnrichedMemoryCache(ILogger logger, IMemoryCache memoryCache, IOptions<EnrichedMemoryCacheSettings> settings)
         {
             _memoryCache = memoryCache;
             _logger = logger;
@@ -36,11 +36,11 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         }
 
         public EnrichedMemoryCache(IMemoryCache memoryCache, ILogger<EnrichedMemoryCache> logger, IOptions<EnrichedMemoryCacheSettings> settings)
-            :this(logger, memoryCache, settings)
-        {            
+            : this(logger, memoryCache, settings)
+        {
         }
 
-        public Task<TEntity> GetOrAdd<TEntity>(string key, Func<Task<TEntity>> valueGetter, 
+        public Task<TEntity> GetOrAdd<TEntity>(string key, Func<Task<TEntity>> valueGetter,
             MemoryCacheEntryOptions cacheOptions, Dictionary<string, string> tags = null)
         {
             if (!_settings.IsEnabled || string.IsNullOrWhiteSpace(key))
@@ -85,7 +85,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             if (!_settings.IsEnabled || string.IsNullOrWhiteSpace(key))
                 return default;
 
-            var result =  _memoryCache.Get<TEntity>(key);
+            var result = _memoryCache.Get<TEntity>(key);
             if (result != null && !result.Equals(default(TEntity)))
             {
                 _cacheKeyUsage.AddOrUpdate(key,
@@ -111,7 +111,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 {
                     v.UsageCounter += 1;
                     return v;
-                });            
+                });
 
             if (tags?.Count > 0)
             {
@@ -159,7 +159,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
         }
 
         public IReadOnlyDictionary<string, CacheItemUsage> GetUsage()
-        {            
+        {
             return new ReadOnlyDictionary<string, CacheItemUsage>(_cacheKeyUsage);
         }
 
@@ -181,7 +181,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             var key = (string)keyObject;
 
             if (state is ChangeNotification notification)
-            {                
+            {
                 foreach (var item in notification.Tags)
                 {
                     var source = GetCancelationTokens(item.Key, item.Value);
@@ -197,7 +197,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 { "Entity", usageCounter.Type.Name},
                 { "Reason", reason.ToString()}
             });
-        }        
+        }
 
         private static void ReportUsage(object state)
         {
@@ -210,7 +210,8 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                         .ToDictionary(v => v.Key, v => $"Items: {v.Count()}, TotalUsage: {v.Sum(v => v.Value.UsageCounter)}");
 
                     memoryCahceInstance._logger.Information("Cache usage", usage);
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     memoryCahceInstance._logger.Debug(ex);
                 }
@@ -225,7 +226,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 _timer.Dispose();
                 _timer = null;
             }
-        }        
+        }
 
         private class ChangeNotification
         {
@@ -239,6 +240,6 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
             public long UsageCounter { get; set; }
 
             public Type Type { get; set; }
-        }        
+        }
     }
 }

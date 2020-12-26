@@ -54,7 +54,8 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
             try
             {
                 await _sender.Add(new CacheReleaseEvent { Key = key }).ConfigureAwait(false);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.Exception(ex);
             }

@@ -33,7 +33,7 @@ namespace SmartDevelopment.Caching.OutputCaching
 
                 context.Items.TryAdd("OutputCache", true);
 
-                await context.Response.Body.WriteAsync(Content, 0, Content.Length).ConfigureAwait(false);                
+                await context.Response.Body.WriteAsync(Content, 0, Content.Length).ConfigureAwait(false);
             }
         }
     }
