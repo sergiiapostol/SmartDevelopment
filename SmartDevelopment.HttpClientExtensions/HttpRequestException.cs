@@ -23,9 +23,11 @@ namespace SmartDevelopment.HttpClientExtensions
 
         public string Uri { get; set; }
 
+        public override string Message => $"Code:{StatusCode}; Phrase:{ReasonPhrase}; Uri:{Uri}; Response:{RawResponse}";
+
         public override string ToString()
         {
-            return base.ToString() + $"Code:{StatusCode}; Phrase:{ReasonPhrase}; Uri:{Uri}; Response:{RawResponse}";
+            return base.ToString() + Message;
         }
     }
 }

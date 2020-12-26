@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace SmartDevelopment.Logging
 {
@@ -27,7 +27,7 @@ namespace SmartDevelopment.Logging
             var @params = new Dictionary<string, string>();
 
             if (extra?.Count > 0)
-                @params["Extra"] = JsonConvert.SerializeObject(extra);
+                @params["Extra"] = JsonSerializer.Serialize(extra);
 
             return @params;
         }
@@ -89,7 +89,7 @@ namespace SmartDevelopment.Logging
             _logger.Log(LogLevel.Information, _eventId, state, null, MessageGetter);
         }
 
-        private IReadOnlyList<KeyValuePair<string, object>> PrepareStateObject(Dictionary<string, string> extra,
+        private static IReadOnlyList<KeyValuePair<string, object>> PrepareStateObject(Dictionary<string, string> extra,
             string message)
         {
             var state = extra == null
@@ -106,9 +106,10 @@ namespace SmartDevelopment.Logging
             _logger.LogDebug(ex, ex.Message);
         }
 
-        private Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> MessageGetter => (state, _) => state.FirstOrDefault(v => v.Key.Equals(MessageKey)).Value?.ToString();
+        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> MessageGetter => 
+            (state, _) => state.FirstOrDefault(v => v.Key.Equals(MessageKey)).Value?.ToString();
 
-        private Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> ExceptionMessageGetter => (_,
-            exception) => exception.Message;
+        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> ExceptionMessageGetter => 
+            (_, exception) => exception.Message;
     }
 }

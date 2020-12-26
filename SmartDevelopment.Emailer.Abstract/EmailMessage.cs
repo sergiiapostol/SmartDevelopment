@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SmartDevelopment.Emailer.Abstract
 {
@@ -41,7 +42,7 @@ namespace SmartDevelopment.Emailer.Abstract
             :base(from, to)
         {
             TemplateId = templateId;
-            TemplateData = TemplateData = JsonConvert.SerializeObject(templateData);
+            TemplateData = TemplateData = JsonSerializer.Serialize(templateData);
         }
     }
 

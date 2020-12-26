@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 
 namespace SmartDevelopment.HttpClientExtensions
 {
@@ -12,7 +12,7 @@ namespace SmartDevelopment.HttpClientExtensions
 
         public static JsonContent Create(object content)
         {
-            var json = JsonConvert.SerializeObject(content);
+            var json = JsonSerializer.Serialize(content);
             return new JsonContent(json);
         }
     }
