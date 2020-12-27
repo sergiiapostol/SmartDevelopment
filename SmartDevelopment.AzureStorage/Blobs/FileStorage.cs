@@ -83,8 +83,6 @@ namespace SmartDevelopment.AzureStorage.Blobs
             if (blob?.Value == null)
                 return null;
 
-            blob.Value.Content.Position = 0;
-
             return new StorageItem(id, blobReference.Uri.ToString(), blob.Value.Content, blob.Value.ContentType, blob.Value.Details.Metadata);
         }
     }

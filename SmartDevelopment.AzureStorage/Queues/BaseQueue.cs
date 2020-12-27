@@ -25,7 +25,8 @@ namespace SmartDevelopment.AzureStorage.Queues
         protected BaseQueue(ConnectionSettings connectionSettings, string queueName)
         {
             QueueName = queueName;
-            Queue = new QueueClient(connectionSettings.ConnectionString, queueName.ToLower());
+            Queue = new QueueClient(connectionSettings.ConnectionString, queueName.ToLower(), 
+                new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64});
         }
 
         public string QueueName { get; }
