@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.WebJobs.Logging.ApplicationInsights;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,9 +14,9 @@ namespace SmartDevelopment.Jobs.Base
             return hostBuilder
             .ConfigureWebJobs(b =>
              {
-                 b.AddAzureStorageCoreServices()
-                 .AddAzureStorage()
-                 .AddTimers();
+                 b.AddAzureStorageCoreServices();
+                 b.AddAzureStorageQueues();
+                 b.AddTimers();
              })
             .UseConsoleLifetime();
         }

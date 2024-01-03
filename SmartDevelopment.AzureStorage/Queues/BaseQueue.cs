@@ -1,11 +1,11 @@
-﻿using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Queue;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 using SmartDevelopment.Messaging;
 using System.Collections.Generic;
 using System.Linq;
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 
 namespace SmartDevelopment.AzureStorage.Queues
 {
@@ -22,14 +22,12 @@ namespace SmartDevelopment.AzureStorage.Queues
     public abstract class BaseQueue<TMessage> : IQueue<TMessage>
         where TMessage : class
     {
-        protected readonly CloudQueue Queue;
+        protected readonly QueueClient Queue;
 
         protected BaseQueue(ConnectionSettings connectionSettings, string queueName)
         {
             QueueName = queueName;
-            var account = CloudStorageAccount.Parse(connectionSettings.ConnectionString);
-            var client = account.CreateCloudQueueClient();
-            Queue = client.GetQueueReference(QueueName.ToLower());
+            Queue = new QueueClient(connectionSettings.ConnectionString, QueueName.ToLower());
         }
 
         public string QueueName { get; }
@@ -44,8 +42,7 @@ namespace SmartDevelopment.AzureStorage.Queues
         public Task Add(TMessage message, TimeSpan? initialDelay = null)
         {
             var payload = JsonConvert.SerializeObject(message);
-            var item = new CloudQueueMessage(payload);
-            return Queue.AddMessageAsync(item, null, initialDelay, null, null);
+            return Queue.SendMessageAsync(payload, initialDelay);
         }
 
         public Task Add(List<TMessage> message, TimeSpan? initialDelay = null)
@@ -55,29 +52,29 @@ namespace SmartDevelopment.AzureStorage.Queues
 
         public async Task<QueueMessage<TMessage>> Get()
         {
-            var item = await Queue.GetMessageAsync().ConfigureAwait(false);
+            var item = await Queue.ReceiveMessageAsync();
             if (item == null)
                 return null;
-            var  message = JsonConvert.DeserializeObject<TMessage>(item.AsString);
-            return new QueueMessage<TMessage>(message, item);
+            var  message = item.Value.Body.ToObjectFromJson<TMessage>();
+            return new QueueMessage<TMessage>(message, item.Value);
         }
 
         public Task Delete(QueueMessage<TMessage> message)
         {
-            return Queue.DeleteMessageAsync(message.OriginalMessage);
+            return Queue.DeleteMessageAsync(message.RawMessage.MessageId, message.RawMessage.PopReceipt);
         }        
     }
 
     public class QueueMessage<TMessage> where TMessage : class
     {
-        public QueueMessage(TMessage message, CloudQueueMessage originalMessage)
+        public QueueMessage(TMessage message, QueueMessage rawMessage)
         {
             Message = message;
-            OriginalMessage = originalMessage;
+            RawMessage = rawMessage;
         }
 
         public TMessage Message { get; }
 
-        public CloudQueueMessage OriginalMessage { get; }
+        public QueueMessage RawMessage { get; }
     }
 }

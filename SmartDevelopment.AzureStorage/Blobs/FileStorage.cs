@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 
 namespace SmartDevelopment.AzureStorage.Blobs
 {
@@ -21,7 +21,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
     public abstract class BaseFileStorage : IFileStorage
     {
-        protected readonly CloudBlobContainer Container;
+        protected readonly BlobContainerClient Container;
 
         private readonly IEnumerable<IContentTypeResolver> _contentTypeMappers;
 
@@ -33,20 +33,19 @@ namespace SmartDevelopment.AzureStorage.Blobs
         {
             ContainerName = containerName.ToLower();
             CacheDuration = cacheDuration;
-            var account = CloudStorageAccount.Parse(connectionSettings.ConnectionString);
-            var client = account.CreateCloudBlobClient();
-            Container = client.GetContainerReference(ContainerName);
+            var client = new BlobServiceClient(connectionSettings.ConnectionString);
+            Container = client.GetBlobContainerClient(ContainerName);
             _contentTypeMappers = contentTypeMappers;
         }
 
         public virtual Task Init()
         {
-            return Container.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Blob, new BlobRequestOptions(), new   OperationContext());
+            return Container.CreateIfNotExistsAsync(PublicAccessType.Blob);
         }
 
         public Task Remove(Guid id)
         {
-            var blob = Container.GetBlockBlobReference(id.ToString());
+            var blob = Container.GetBlobClient(id.ToString());
             return blob.DeleteAsync();
         }
 
@@ -55,46 +54,46 @@ namespace SmartDevelopment.AzureStorage.Blobs
         {
             var id = Guid.NewGuid();
 
-            var blob = Container.GetBlockBlobReference(id.ToString());
+            var blob = Container.GetBlobClient(id.ToString());
 
-            await blob.UploadFromStreamAsync(stream).ConfigureAwait(false);
+            await blob.UploadAsync(stream);
 
-            blob.Properties.ContentType = contentType ??
-                _contentTypeMappers?.Select(v => v.GetContentType(fileExtension)).FirstOrDefault(v => !string.IsNullOrEmpty(v));
-            blob.Properties.ContentDisposition = $"attachment; filename=\"{ id}{fileExtension}\"";            
+            var headers = new BlobHttpHeaders() 
+            { 
+                ContentType = contentType ??
+                _contentTypeMappers?.Select(v => v.GetContentType(fileExtension)).FirstOrDefault(v => !string.IsNullOrEmpty(v)),
+                ContentDisposition = $"attachment; filename=\"{id}{fileExtension}\""
+            };        
 
             if ((cacheDuration ?? CacheDuration).HasValue)
-                blob.Properties.CacheControl = $"public, max-age={(cacheDuration ?? CacheDuration)}";
-
-            await blob.SetPropertiesAsync().ConfigureAwait(false);
+                headers.CacheControl = $"public, max-age={(cacheDuration ?? CacheDuration)}";            
 
             metadata ??= new Dictionary<string, string>();
             metadata["CreatedAt"] = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
             if(!string.IsNullOrWhiteSpace(fileExtension))
                 metadata["Extension"] = fileExtension;
-
-            foreach (var data in metadata)
-            {
-                blob.Metadata.Add(data.Key, data.Value);
-            }
-            await blob.SetMetadataAsync().ConfigureAwait(false);
+            
+            await Task.WhenAll(
+                blob.SetHttpHeadersAsync(headers), 
+                blob.SetMetadataAsync(metadata));
 
             return new StorageItem(id, blob.Uri.ToString(), stream, contentType, metadata);
         }
 
         public async Task<StorageItem> Get(Guid id)
         {
-            var blob = Container.GetBlockBlobReference(id.ToString());
-            if (!await blob.ExistsAsync().ConfigureAwait(false))
+            var blob = Container.GetBlobClient(id.ToString());
+            if (!await blob.ExistsAsync())
             {
                 return null;
             }
 
             var stream = new MemoryStream();
-            await blob.DownloadToStreamAsync(stream).ConfigureAwait(false);
+            await blob.DownloadToAsync(stream);
             stream.Position = 0;
-
-            return new StorageItem(id, blob.Uri.ToString(), stream, blob.Properties.ContentType, blob.Metadata);
+            
+            var properties = await blob.GetPropertiesAsync();
+            return new StorageItem(id, blob.Uri.ToString(), stream, properties.Value.ContentType, properties.Value.Metadata);
         }
     }
 }

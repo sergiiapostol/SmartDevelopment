@@ -1,106 +1,90 @@
-﻿using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.ServiceBus.Core;
-using Microsoft.Azure.ServiceBus.Management;
+﻿using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
-using SmartDevelopment.Logging;
 using SmartDevelopment.Messaging;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using ILogger = SmartDevelopment.Logging.ILogger;
 
 namespace SmartDevelopment.ServiceBus
 {
-    class ChannelReceiver<TMessage>
+    public abstract class ChannelReceiver<TMessage> : IAsyncDisposable
         where TMessage : class
     {
-        public ChannelReceiver(IReceiverClient receiverClient,
-            Func<TMessage, Task> messageHandler,
-            ILogger logger)
-        {
-            receiverClient.RegisterMessageHandler(async (v, token) =>
-            {
-                try
-                {
-                    var messageObject = JsonConvert.DeserializeObject<TMessage>(Encoding.UTF8.GetString(v.Body));
-                    await messageHandler(messageObject).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    logger.Exception(ex);
-                }
-            }, new MessageHandlerOptions(v =>
-            {
-                logger.Exception(v.Exception);
-                return Task.CompletedTask;
-            })
-            {
-                AutoComplete = true,
-                MaxConcurrentCalls = 1
-            });
-        }
-    }
+        private readonly ILogger _logger;
+        protected ServiceBusProcessor Processor;
+        protected ServiceBusClient Client;
 
-    public abstract class BaseTopicReceiver<TMessage> : IChannelReceiver<TMessage>, IAsyncDisposable
-        where TMessage : class
-    {
-        private readonly ISubscriptionClient _client;
-        private readonly ChannelReceiver<TMessage> _channel;
-        private readonly ConnectionSettings _connectionSettings;
-        private readonly string _subscriptionName;
-
-        protected BaseTopicReceiver(ConnectionSettings connectionSettings, string topicName, string subscriptionName, ILogger logger)
-        {
-            _connectionSettings = connectionSettings;
-            _subscriptionName = subscriptionName;
-            ChannelName = topicName;
-            _client = new SubscriptionClient(connectionSettings.ConnectionString, topicName, subscriptionName);
-            _channel = new ChannelReceiver<TMessage>(_client, v => ProcessMessage(v), logger);
+        protected ChannelReceiver(ILogger logger)
+        {                       
+            _logger = logger;            
         }
 
-        public string ChannelName { get; }
+        public string ChannelName { get; protected set; }
 
         public async ValueTask DisposeAsync()
         {
-            await _client.CloseAsync().ConfigureAwait(false);
-        }
-
-        public async Task Init()
-        {
-            var managementClient = new ManagementClient(_connectionSettings.ConnectionString);
-            if (!await managementClient.SubscriptionExistsAsync(ChannelName, _subscriptionName).ConfigureAwait(false))
-            {
-                await managementClient.CreateSubscriptionAsync(new SubscriptionDescription(ChannelName, _subscriptionName)).ConfigureAwait(false);
-            }
-            await managementClient.CloseAsync().ConfigureAwait(false);
-        }
-
-        public abstract Task ProcessMessage(TMessage message);
-    }
-
-    public abstract class BaseQueueReceiver<TMessage> : IChannelReceiver<TMessage>, IAsyncDisposable
-        where TMessage : class
-    {
-        private readonly IQueueClient _client;
-        private readonly ChannelReceiver<TMessage> _channel;
-        protected BaseQueueReceiver(ConnectionSettings connectionSettings, string queueName, ILogger logger)
-        {
-            ChannelName = queueName;
-            _client = new QueueClient(connectionSettings.ConnectionString, queueName);
-            _channel = new ChannelReceiver<TMessage>(_client, v => ProcessMessage(v), logger);
-        }
-
-        public string ChannelName { get; }
-
-        public async ValueTask DisposeAsync()
-        {
-            await _client.CloseAsync().ConfigureAwait(false);
+            await Processor.StopProcessingAsync();
+            Processor.ProcessMessageAsync -= MessageHandler;
+            Processor.ProcessErrorAsync -= ErrorHandler;            
+            await Processor.DisposeAsync();
+            await Client.DisposeAsync();
         }
 
         public Task Init()
         {
-            return Task.CompletedTask;
+            Processor.ProcessMessageAsync += MessageHandler;
+            Processor.ProcessErrorAsync += ErrorHandler;
+            return Processor.StartProcessingAsync();
         }
 
         public abstract Task ProcessMessage(TMessage message);
+
+        private async Task MessageHandler(ProcessMessageEventArgs args)
+        {
+            try
+            {
+                var messageObject = JsonConvert.DeserializeObject<TMessage>(Encoding.UTF8.GetString(args.Message.Body));
+                await ProcessMessage(messageObject);
+            }
+            catch (Exception ex)
+            {
+                _logger.Exception(ex);
+            }
+
+            await args.CompleteMessageAsync(args.Message);
+        }
+
+        private Task ErrorHandler(ProcessErrorEventArgs args)
+        {
+            _logger.Exception(args.Exception);
+            return Task.CompletedTask;
+        }
+    }
+
+    public abstract class BaseTopicReceiver<TMessage> : ChannelReceiver<TMessage>, IChannelReceiver<TMessage>
+        where TMessage : class
+    {
+        protected BaseTopicReceiver(ConnectionSettings connectionSettings, string topicName, string subscriptionName, ILogger logger)
+            :base(logger)
+        {
+            ChannelName = topicName;
+            Client = new ServiceBusClient(connectionSettings.ConnectionString);
+            Processor = Client.CreateProcessor(topicName, subscriptionName, 
+                new ServiceBusProcessorOptions { AutoCompleteMessages = true, MaxConcurrentCalls = 1 });
+        }
+    }
+
+    public abstract class BaseQueueReceiver<TMessage> : ChannelReceiver<TMessage>, IChannelReceiver<TMessage>
+        where TMessage : class
+    {
+        protected BaseQueueReceiver(ConnectionSettings connectionSettings, string queueName, ILogger logger)
+            :base(logger) 
+        {
+            ChannelName = queueName;
+            Client = new ServiceBusClient(connectionSettings.ConnectionString);
+            Processor = Client.CreateProcessor(queueName,
+                new ServiceBusProcessorOptions { AutoCompleteMessages = true, MaxConcurrentCalls = 1 });
+        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.ServiceBus.Core;
-using Microsoft.Azure.ServiceBus.Management;
+﻿using Azure.Messaging.ServiceBus;
 using Newtonsoft.Json;
 using SmartDevelopment.Messaging;
 using System;
@@ -11,21 +9,26 @@ using System.Threading.Tasks;
 
 namespace SmartDevelopment.ServiceBus
 {
-    class ChannelSender<TMessage>
+    public abstract class ChannelSender<TMessage> : IAsyncDisposable
         where TMessage : class
     {
-        private readonly ISenderClient _client;
+        private readonly ServiceBusClient _client;
+        private readonly ServiceBusSender _sender;
 
-        public ChannelSender(ISenderClient client)
+        public string ChannelName { get; protected set; }
+
+        protected ChannelSender(ConnectionSettings connectionSettings, string targetName)
         {
-            _client = client;
+            ChannelName = targetName;
+            _client = new ServiceBusClient(connectionSettings.ConnectionString);
+            _sender = _client.CreateSender(targetName);
         }
 
-        private Message CreateMessage(TMessage message, TimeSpan? initialDelay = null)
+        private ServiceBusMessage CreateMessage(TMessage message, TimeSpan? initialDelay = null)
         {
-            var messageObject = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
+            var messageObject = new ServiceBusMessage(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
             if (initialDelay.HasValue)
-                messageObject.ScheduledEnqueueTimeUtc = DateTime.UtcNow.Add(initialDelay.Value);
+                messageObject.ScheduledEnqueueTime = DateTime.UtcNow.Add(initialDelay.Value);
 
             return messageObject;
         }
@@ -34,111 +37,41 @@ namespace SmartDevelopment.ServiceBus
         {
             var messageToSend = CreateMessage(message, initialDelay);
 
-            return _client.SendAsync(messageToSend);
+            return _sender.SendMessageAsync(messageToSend);
         }
 
         public Task Add(List<TMessage> messages, TimeSpan? initialDelay = null)
         {
             var messagesToSend = messages.Select(v => CreateMessage(v, initialDelay)).ToList();
 
-            return _client.SendAsync(messagesToSend);
-        }
-    }
-
-    public class BaseQueueSender<TMessage> : IChannelSender<TMessage>, IAsyncDisposable 
-        where TMessage : class
-    {
-        private readonly IQueueClient _client;
-        protected readonly ConnectionSettings _connectionSettings;
-        private readonly ChannelSender<TMessage> _channel;
-
-        protected BaseQueueSender(ConnectionSettings connectionSettings, string queueName)
-        {
-            ChannelName = queueName;
-            _connectionSettings = connectionSettings;
-            _client = new QueueClient(connectionSettings.ConnectionString, ChannelName);
-            _channel = new ChannelSender<TMessage>(_client);
+            return _sender.SendMessagesAsync(messagesToSend);
         }
 
-        public string ChannelName { get; }
-
-        public Task Add(TMessage message, TimeSpan? initialDelay = null)
+        public Task Init()
         {
-            return _channel.Add(message, initialDelay);
-        }
-
-        public Task Add(List<TMessage> messages, TimeSpan? initialDelay = null)
-        {
-            return _channel.Add(messages, initialDelay);
-        }
-
-        public async Task Init()
-        {
-            var managementClient = new ManagementClient(_connectionSettings.ConnectionString);
-            if(!await managementClient.QueueExistsAsync(ChannelName).ConfigureAwait(false))
-            {
-                await managementClient.CreateQueueAsync(new QueueDescription(ChannelName)
-                {
-                    DefaultMessageTimeToLive = TimeSpan.FromDays(7),
-                    EnableBatchedOperations = true,
-                    EnableDeadLetteringOnMessageExpiration = true,
-                    LockDuration = TimeSpan.FromMinutes(5),
-                    MaxDeliveryCount = 10
-                }).ConfigureAwait(false);
-            }
-            await managementClient.CloseAsync().ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         public async ValueTask DisposeAsync()
         {
-            await _client.CloseAsync().ConfigureAwait(false);
+            await _sender.DisposeAsync();
+            await _client.DisposeAsync();
         }
     }
 
-    public class BaseTopicSender<TMessage> : IChannelSender<TMessage>, IAsyncDisposable
+    public abstract class BaseQueueSender<TMessage> : ChannelSender<TMessage>, IChannelSender<TMessage>
         where TMessage : class
     {
-        private readonly ITopicClient _client;
-        protected readonly ConnectionSettings _connectionSettings;
-        private readonly ChannelSender<TMessage> _channel;
-
-        protected BaseTopicSender(ConnectionSettings connectionSettings, string topicName)
+        public BaseQueueSender(ConnectionSettings connectionSettings, string queueName) : base(connectionSettings, queueName)
         {
-            ChannelName = topicName;
-            _connectionSettings = connectionSettings;
-            _client = new TopicClient(connectionSettings.ConnectionString, ChannelName);
-            _channel = new ChannelSender<TMessage>(_client);
         }
+    }
 
-        public string ChannelName { get; }
-
-        public Task Add(TMessage message, TimeSpan? initialDelay = null)
+    public abstract class BaseTopicSender<TMessage> : ChannelSender<TMessage>, IChannelSender<TMessage>
+        where TMessage : class
+    {
+        public BaseTopicSender(ConnectionSettings connectionSettings, string topicName) : base(connectionSettings, topicName)
         {
-            return _channel.Add(message, initialDelay);
-        }
-
-        public Task Add(List<TMessage> messages, TimeSpan? initialDelay = null)
-        {
-            return _channel.Add(messages, initialDelay);
-        }
-
-        public async Task Init()
-        {
-            var managementClient = new ManagementClient(_connectionSettings.ConnectionString);
-            if (!await managementClient.TopicExistsAsync(ChannelName).ConfigureAwait(false))
-            {
-                await managementClient.CreateTopicAsync(new TopicDescription(ChannelName)
-                {
-                    DefaultMessageTimeToLive = TimeSpan.FromDays(7),
-                    EnableBatchedOperations = true,
-                }).ConfigureAwait(false);
-            }
-            await managementClient.CloseAsync().ConfigureAwait(false);
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            await _client.CloseAsync().ConfigureAwait(false);
         }
     }
 }
