@@ -38,8 +38,8 @@ namespace SmartDevelopment.ApplicationInsight.Extensions
                 {
                     var request = item as RequestTelemetry;
                     var excludedByName = Settings.NamesToExclude.Any(v =>
-                        request.Name.ToLowerInvariant().Contains(v.ToLowerInvariant()) ||
-                        request.Url.OriginalString.ToLowerInvariant().Contains(v.ToLowerInvariant()));
+                        (request.Name?.ToLowerInvariant().Contains(v.ToLowerInvariant())) ?? false ||
+                        (request.Url?.OriginalString.ToLowerInvariant().Contains(v.ToLowerInvariant()) ?? false));
 
                     return !excludedByName || !(request.Success ?? false);
                 }
