@@ -180,6 +180,21 @@ namespace SmartDevelopment.Dal.MongoDb
             return entity;
         }
 
+        public virtual async Task<TEntity> UpsertAsync(ObjectId id, TEntity entity)
+        {
+            if (entity == null)
+                throw new NullReferenceException("Entity is required");
+
+            entity.ModifiedAt = DateTime.UtcNow;
+
+            var result =
+                await
+                    Collection.ReplaceOneAsync(v => v.Id.Equals(id), entity, new ReplaceOptions { IsUpsert = true })
+                        .ConfigureAwait(false);
+
+            return entity;
+        }
+
         public virtual async Task<long> UpdateAsync(IList<TEntity> entities)
         {
             if (entities == null)

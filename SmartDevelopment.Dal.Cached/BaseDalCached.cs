@@ -89,6 +89,22 @@ namespace SmartDevelopment.Dal.Cached
             return result;
         }
 
+        public async Task<TEntity> UpsertAsync(ObjectId id, TEntity entity)
+        {
+            var result = await _dal.UpsertAsync(id, entity).ConfigureAwait(false);
+
+            try
+            {
+                await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.Exception(ex);
+            }
+
+            return result;
+        }
+
         public async Task<long> UpdateAsync(IList<TEntity> entities)
         {
             var result = await _dal.UpdateAsync(entities).ConfigureAwait(false);

@@ -190,13 +190,13 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 notification.Source.Dispose();
             }
 
-            _cacheKeyUsage.TryRemove(key, out var usageCounter);
-            _logger.Debug("Cache item evicted", new Dictionary<string, string> {
-                {"Key", key },
-                {"Usage", usageCounter.UsageCounter.ToString() },
-                { "Entity", usageCounter.Type.Name},
-                { "Reason", reason.ToString()}
-            });
+            if(_cacheKeyUsage.TryRemove(key, out var usageCounter))
+                _logger.Debug("Cache item evicted", new Dictionary<string, string> {
+                    {"Key", key },
+                    {"Usage", usageCounter.UsageCounter.ToString() },
+                    { "Entity", usageCounter.Type.Name},
+                    { "Reason", reason.ToString()}
+                });
         }        
 
         private static void ReportUsage(object state)

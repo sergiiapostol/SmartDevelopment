@@ -18,6 +18,7 @@ namespace SmartDevelopment.Dal.Abstractions
         Task<InsertOrUpdateResult> InsertOrUpdateAsync(List<TEntity> entities);
 
         Task<TEntity> UpdateAsync(ObjectId id, TEntity entity);
+        Task<TEntity> UpsertAsync(ObjectId id, TEntity entity);
         Task<long> UpdateAsync(IList<TEntity> entities);
 
         Task<long> SetAsync<TProperty>(Expression<Func<TEntity, bool>> filter,
