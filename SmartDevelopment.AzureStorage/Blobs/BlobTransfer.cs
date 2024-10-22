@@ -16,16 +16,12 @@ namespace SmartDevelopment.AzureStorage.Blobs
 
         public async Task<StorageItem> Move(IFileStorage from, IFileStorage to, Guid fileId)
         {
-            var file = await from.Get(fileId).ConfigureAwait(false);
-            if (file == null)
-            {
-                throw new FileNotFoundException($"File {fileId} not found in {from.ContainerName}");
-            }
-            var newFile = await to.Save(file.Stream, null, file.ContentType, file.Metadata).ConfigureAwait(false);
+            var file = await from.Get(fileId) ?? throw new FileNotFoundException($"File {fileId} not found in {from.ContainerName}");
+            var newFile = await to.Save(file.Stream, null, file.ContentType, file.Metadata);
 
             try
             {
-                await from.Remove(fileId).ConfigureAwait(false);
+                await from.Remove(fileId);
             }
             catch (Exception ex)
             {

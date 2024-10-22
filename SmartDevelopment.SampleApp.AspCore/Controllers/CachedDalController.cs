@@ -32,19 +32,19 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         public async Task<IActionResult> Create()
         {
             var entity = new TestEntity { Text = "1" };
-            await _dal.InsertAsync(entity).ConfigureAwait(false);
-            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
+            await _dal.InsertAsync(entity);
+            entity = await _dal.GetAsync(entity.Id);
 
-            await _dal.SetAsync(entity.Id, v => v.Text, "2").ConfigureAwait(false);
-            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
+            await _dal.SetAsync(entity.Id, v => v.Text, "2");
+            entity = await _dal.GetAsync(entity.Id);
 
             await _dal.SetAsync(entity.Id, 
-                new List<PropertyUpdate<TestEntity>> { new PropertyUpdate<TestEntity>(v=>v.Text, "3") }).ConfigureAwait(false);
-            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
+                [new PropertyUpdate<TestEntity>(v=>v.Text, "3")]);
+            entity = await _dal.GetAsync(entity.Id);
 
             entity.Text = "4";
-            await _dal.UpdateAsync(entity.Id, entity).ConfigureAwait(false);
-            entity = await _dal.GetAsync(entity.Id).ConfigureAwait(false);
+            await _dal.UpdateAsync(entity.Id, entity);
+            entity = await _dal.GetAsync(entity.Id);
 
             return Ok();
         }
@@ -74,6 +74,6 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
 
         protected override string CacheKey => "Test";
 
-        protected override MemoryCacheEntryOptions CacheOptions => new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(30) };
+        protected override MemoryCacheEntryOptions CacheOptions => new() { SlidingExpiration = TimeSpan.FromMinutes(30) };
     }
 }

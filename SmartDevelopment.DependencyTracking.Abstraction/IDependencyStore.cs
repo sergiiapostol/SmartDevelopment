@@ -22,8 +22,8 @@ namespace SmartDevelopment.DependencyTracking
 
         public DateTime StartTime { get; internal set; }
 
-        public Dictionary<string, double> Metrics { get; internal set; } = new Dictionary<string, double>();
+        public Dictionary<string, double> Metrics { get; internal set; } = [];
 
-        public Dictionary<string, string> Properties { get; internal set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Properties { get; internal set; } = [];
     }
 }

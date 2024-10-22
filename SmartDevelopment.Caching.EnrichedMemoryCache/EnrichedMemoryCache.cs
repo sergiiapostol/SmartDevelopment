@@ -21,9 +21,9 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
 
 
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentDictionary<string, CancellationTokenSource>>> _cancelationTokens =
-            new ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentDictionary<string, CancellationTokenSource>>>();
+            new();
 
-        private readonly ConcurrentDictionary<string, CacheItemUsage> _cacheKeyUsage = new ConcurrentDictionary<string, CacheItemUsage>();
+        private readonly ConcurrentDictionary<string, CacheItemUsage> _cacheKeyUsage = new();
 
         private Timer _timer;
 
@@ -225,6 +225,8 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache
                 _timer.Dispose();
                 _timer = null;
             }
+
+            GC.SuppressFinalize(this);
         }        
 
         private class ChangeNotification

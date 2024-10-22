@@ -23,7 +23,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
             {
                 try
                 {
-                    await store.Init().ConfigureAwait(false);
+                    await store.Init();
                 }
                 catch (Exception ex)
                 {

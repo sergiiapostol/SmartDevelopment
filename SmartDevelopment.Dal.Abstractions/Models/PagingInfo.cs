@@ -22,8 +22,8 @@
 
         public int Skip => Page * PageSize;
 
-        public static PagingInfo Default => new PagingInfo(0, 50);
+        public static PagingInfo Default => new(0, 50);
 
-        public static PagingInfo OneItem => new PagingInfo(0, 1);
+        public static PagingInfo OneItem => new(0, 1);
     }
 }

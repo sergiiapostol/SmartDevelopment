@@ -23,7 +23,7 @@ namespace SmartDevelopment.Messaging
             {
                 try
                 {
-                    await queue.Init().ConfigureAwait(false);
+                    await queue.Init();
                 }
                 catch (Exception ex)
                 {

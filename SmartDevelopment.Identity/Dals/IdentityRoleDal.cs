@@ -18,7 +18,7 @@ namespace SmartDevelopment.Identity.Dals
         {
             return Collection.Indexes.CreateManyAsync(new List<CreateIndexModel<TRole>>
             {
-                new CreateIndexModel<TRole>(
+                new(
                     Builders<TRole>.IndexKeys
                         .Descending(v => v.NormalizedName),
                     new CreateIndexOptions<TRole>

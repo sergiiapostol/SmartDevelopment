@@ -6,6 +6,6 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
     {
         public string DependencyName { get; set; } = "MongoDb";
 
-        public List<string> IgnoredCommands { get; set; } = new List<string> { "isMaster", "buildInfo", "getLastError", "saslStart", "saslContinue" };
+        public List<string> IgnoredCommands { get; set; } = ["isMaster", "buildInfo", "getLastError", "saslStart", "saslContinue"];
     }
 }

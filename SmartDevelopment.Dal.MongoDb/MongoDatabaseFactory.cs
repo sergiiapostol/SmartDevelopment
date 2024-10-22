@@ -18,7 +18,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
         private IMongoDatabase _database;
 
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         public MongoDatabaseFactory(ConnectionSettings connectionSettings, IMongoClientFactory clientFactory)
         {
@@ -42,7 +42,7 @@ namespace SmartDevelopment.Dal.MongoDb
                         var client = _clientFactory.GetClient(connectionString);
 
                         _database = client.GetDatabase(connectionString.DatabaseName,
-                            new MongoDatabaseSettings {GuidRepresentation = GuidRepresentation.CSharpLegacy});
+                            new MongoDatabaseSettings());
                     }
                 }
             }

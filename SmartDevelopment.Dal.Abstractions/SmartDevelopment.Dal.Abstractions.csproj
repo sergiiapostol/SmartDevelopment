@@ -7,11 +7,13 @@
     <Product>SmartDevelopment.Dal</Product>
     <RepositoryUrl>https://github.com/sergiiapostol/SmartDevelopment</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <Version>8.0.1</Version>
+    <Version>8.0.2</Version>
+	  <IncludeSymbols>True</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Bson" Version="2.23.1" />
+    <PackageReference Include="MongoDB.Bson" Version="3.0.0" />
   </ItemGroup>
 
 </Project>

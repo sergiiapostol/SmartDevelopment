@@ -7,7 +7,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
 {
     public class ReleaseCacheReceiver : BaseTopicReceiver<CacheReleaseEvent>
     {
-        private readonly IEnrichedMemoryCache _enrichedMemoryCache;
+        private readonly EnrichedMemoryCache _enrichedMemoryCache;
 
         public ReleaseCacheReceiver(EnrichedMemoryCache enrichedMemoryCache, IOptions<DistributedEnrichedMemoryCacheSettings> settings,
             ConnectionSettings connectionSettings, ILogger<ReleaseCacheReceiver> logger)

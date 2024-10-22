@@ -37,7 +37,7 @@ namespace SmartDevelopment.Logging
             return source?.Keys.Cast<object>().ToDictionary(key => key.ToString(), key => source[key]?.ToString());
         }
 
-        private readonly EventId _eventId = new EventId(1);
+        private readonly EventId _eventId = new(1);
 
         public void Exception(Exception ex)
         {
@@ -89,11 +89,11 @@ namespace SmartDevelopment.Logging
             _logger.Log(LogLevel.Information, _eventId, state, null, MessageGetter);
         }
 
-        private IReadOnlyList<KeyValuePair<string, object>> PrepareStateObject(Dictionary<string, string> extra,
+        private static ImmutableList<KeyValuePair<string, object>> PrepareStateObject(Dictionary<string, string> extra,
             string message)
         {
             var state = extra == null
-                ? new Dictionary<string, object>()
+                ? []
                 : extra.Where(v => !string.IsNullOrEmpty(v.Value)).ToDictionary(v => v.Key, v => (object)v.Value);
             if (!string.IsNullOrEmpty(message))
                 state[MessageKey] = message;
@@ -106,9 +106,9 @@ namespace SmartDevelopment.Logging
             _logger.LogDebug(ex, ex.Message);
         }
 
-        private Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> MessageGetter => (state, _) => state.FirstOrDefault(v => v.Key.Equals(MessageKey)).Value?.ToString();
+        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> MessageGetter => (state, _) => state.FirstOrDefault(v => v.Key.Equals(MessageKey)).Value?.ToString();
 
-        private Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> ExceptionMessageGetter => (_,
+        private static Func<IReadOnlyList<KeyValuePair<string, object>>, Exception, string> ExceptionMessageGetter => (_,
             exception) => exception.Message;
     }
 }

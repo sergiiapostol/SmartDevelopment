@@ -39,8 +39,8 @@ namespace SmartDevelopment.HttpClientExtensions
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             }
 
-            using var response = await client.SendAsync(request).ConfigureAwait(false);
-            return await response.Deserialize<TResult>(jsonSerializer).ConfigureAwait(false);
+            using var response = await client.SendAsync(request);
+            return await response.Deserialize<TResult>(jsonSerializer);
         }
 
         private static Task<TResult> SendAsync<TModel, TResult>(HttpClient client, string url, TModel model, 
@@ -127,15 +127,15 @@ namespace SmartDevelopment.HttpClientExtensions
             return SendAsync<TResult>(client, url, HttpMethod.Put, CreateForm(files), authToken, jsonSerializer, headers);
         }
 
-        private static readonly JsonSerializer _serializer = new JsonSerializer();
+        private static readonly JsonSerializer _serializer = new();
 
         public static async Task<TObject> Deserialize<TObject>(this HttpResponseMessage response, JsonSerializer jsonSerializer = null) where TObject : class
         {
             jsonSerializer ??= _serializer;
 
-            await ThrowIfNotSuccess(response).ConfigureAwait(false);
+            await ThrowIfNotSuccess(response);
 
-            using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+            using (var stream = await response.Content.ReadAsStreamAsync())
             using (var sr = new StreamReader(stream))
             using (var jsonTextReader = new JsonTextReader(sr))
             {
@@ -151,7 +151,7 @@ namespace SmartDevelopment.HttpClientExtensions
                     try
                     {
                         stream.Position = 0;
-                        rawResponse = await sr.ReadLineAsync().ConfigureAwait(false);
+                        rawResponse = await sr.ReadLineAsync();
                         exception.Data.Add("rawResponse", rawResponse);
                     }
                     catch { }
@@ -175,7 +175,7 @@ namespace SmartDevelopment.HttpClientExtensions
                 try
                 {
                     if(response.Content != null)
-                        exception.RawResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        exception.RawResponse = await response.Content.ReadAsStringAsync();
                 }
                 catch { }
 

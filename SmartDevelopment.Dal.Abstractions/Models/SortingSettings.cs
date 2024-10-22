@@ -8,7 +8,7 @@ namespace SmartDevelopment.Dal.Abstractions.Models
     {
         SortingSettings()
         {
-            Items = new List<SortingItem>();
+            Items = [];
         }
 
         public SortingSettings(SortingItem sorting):this()

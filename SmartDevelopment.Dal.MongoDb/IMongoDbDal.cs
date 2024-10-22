@@ -1,11 +1,11 @@
-﻿using MongoDB.Driver.Linq;
-using SmartDevelopment.Dal.Abstractions;
+﻿using SmartDevelopment.Dal.Abstractions;
+using System.Linq;
 
 namespace SmartDevelopment.Dal.MongoDb
 {
     public interface IMongoDbDal<TEntity> : IDal<TEntity>
         where TEntity : class, IDbEntity
     {
-        IMongoQueryable<TEntity> AsMongoDbQueryable();
+        IQueryable<TEntity> AsMongoDbQueryable();
     }
 }

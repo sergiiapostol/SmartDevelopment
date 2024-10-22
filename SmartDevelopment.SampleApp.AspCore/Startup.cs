@@ -249,13 +249,13 @@ namespace SmartDevelopment.SampleApp.AspCore
                 ApplicationLogger.Debug("Application starting");
 
                 var indexManager = app.ApplicationServices.GetService<IndexesManager>();
-                await indexManager.UpdateIndexes().ConfigureAwait(false);
+                await indexManager.UpdateIndexes();
 
                 var blobs = app.ApplicationServices.GetService<BlobsInitializator>();
-                await blobs.Init().ConfigureAwait(false);
+                await blobs.Init();
 
                 var queues = app.ApplicationServices.GetService<ChannelsInitializator>();                
-                await queues.Init().ConfigureAwait(false);
+                await queues.Init();
             });
         }
     }

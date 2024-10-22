@@ -55,11 +55,11 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<InsertOrUpdateResult> InsertOrUpdateAsync(List<TEntity> entities)
         {
-            var result = await _dal.InsertOrUpdateAsync(entities).ConfigureAwait(false);
+            var result = await _dal.InsertOrUpdateAsync(entities);
 
             try
             {
-                await Task.WhenAll(entities.Select(v => _memoryCache.Remove(GetCacheKey(v.Id))).ToList()).ConfigureAwait(false);
+                await Task.WhenAll(entities.Select(v => _memoryCache.Remove(GetCacheKey(v.Id))).ToList());
             }
             catch (Exception ex)
             {
@@ -75,11 +75,11 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<TEntity> UpdateAsync(ObjectId id, TEntity entity)
         {
-            var result = await _dal.UpdateAsync(id, entity).ConfigureAwait(false);
+            var result = await _dal.UpdateAsync(id, entity);
 
             try
             {
-                await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
+                await _memoryCache.Remove(GetCacheKey(id));
             }
             catch (Exception ex)
             {
@@ -91,11 +91,11 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<TEntity> UpsertAsync(ObjectId id, TEntity entity)
         {
-            var result = await _dal.UpsertAsync(id, entity).ConfigureAwait(false);
+            var result = await _dal.UpsertAsync(id, entity);
 
             try
             {
-                await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
+                await _memoryCache.Remove(GetCacheKey(id));
             }
             catch (Exception ex)
             {
@@ -107,11 +107,11 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<long> UpdateAsync(IList<TEntity> entities)
         {
-            var result = await _dal.UpdateAsync(entities).ConfigureAwait(false);
+            var result = await _dal.UpdateAsync(entities);
 
             try
             {
-                await Task.WhenAll(entities.Select(v => _memoryCache.Remove(GetCacheKey(v.Id))).ToList()).ConfigureAwait(false);
+                await Task.WhenAll(entities.Select(v => _memoryCache.Remove(GetCacheKey(v.Id))).ToList());
             }
             catch (Exception ex)
             {
@@ -128,10 +128,10 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<long> SetAsync<TProperty>(ObjectId id, Expression<Func<TEntity, TProperty>> property, TProperty value, bool upsert = false)
         {
-            var result = await _dal.SetAsync(id, property, value, upsert).ConfigureAwait(false);
+            var result = await _dal.SetAsync(id, property, value, upsert);
             try
             {
-                await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
+                await _memoryCache.Remove(GetCacheKey(id));
             }
             catch (Exception ex)
             {
@@ -148,10 +148,10 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<long> SetAsync(ObjectId id, List<PropertyUpdate<TEntity>> updates, bool upsert = false)
         {
-            var result = await _dal.SetAsync(id, updates, upsert).ConfigureAwait(false);
+            var result = await _dal.SetAsync(id, updates, upsert);
             try
             {
-                await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
+                await _memoryCache.Remove(GetCacheKey(id));
             }
             catch (Exception ex)
             {
@@ -168,10 +168,10 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task<long> IncrementProperty<TProperty>(ObjectId id, Expression<Func<TEntity, TProperty>> property, TProperty value)
         {
-            var result = await _dal.IncrementProperty(id, property, value).ConfigureAwait(false);
+            var result = await _dal.IncrementProperty(id, property, value);
             try
             {
-                await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
+                await _memoryCache.Remove(GetCacheKey(id));
             }
             catch (Exception ex)
             {
@@ -187,11 +187,11 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task DeleteAsync(ObjectId id)
         {
-            await _dal.DeleteAsync(id).ConfigureAwait(false);
+            await _dal.DeleteAsync(id);
 
             try
             {
-                await _memoryCache.Remove(GetCacheKey(id)).ConfigureAwait(false);
+                await _memoryCache.Remove(GetCacheKey(id));
             }
             catch (Exception ex)
             {
@@ -201,11 +201,11 @@ namespace SmartDevelopment.Dal.Cached
 
         public async Task DeleteAsync(TEntity entity)
         {
-            await _dal.DeleteAsync(entity).ConfigureAwait(false);
+            await _dal.DeleteAsync(entity);
 
             try
             {
-                await _memoryCache.Remove(GetCacheKey(entity.Id)).ConfigureAwait(false);
+                await _memoryCache.Remove(GetCacheKey(entity.Id));
             }
             catch (Exception ex)
             {
@@ -225,10 +225,10 @@ namespace SmartDevelopment.Dal.Cached
         public async Task<TEntity> GetAsync(ObjectId id)
         {
             var cachedEntity = await _memoryCache.GetOrAdd(GetCacheKey(id), () => _dal.GetAsync(id), CacheOptions, 
-                new Dictionary<string, string> { { CacheKey, id.ToString()} }).ConfigureAwait(false);
+                new Dictionary<string, string> { { CacheKey, id.ToString()} });
 
             if (cachedEntity == null)
-                return await _dal.GetAsync(id).ConfigureAwait(false);
+                return await _dal.GetAsync(id);
 
             return cachedEntity;
         }

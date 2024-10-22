@@ -31,14 +31,14 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         [HttpPost, Route("TestQueue")]
         public async Task<ActionResult> TestQueue()
         {
-            await _testQueueSender.Add(new TestMessage { A = _random.Next() }).ConfigureAwait(false);
+            await _testQueueSender.Add(new TestMessage { A = _random.Next() });
             return Ok();
         }
 
         [HttpPost, Route("TestTopic")]
         public async Task<ActionResult> TestTopic()
         {
-            await _testTopicSender.Add(new TestMessage { A = _random.Next() }).ConfigureAwait(false);
+            await _testTopicSender.Add(new TestMessage { A = _random.Next() });
             return Ok();
         }
     }

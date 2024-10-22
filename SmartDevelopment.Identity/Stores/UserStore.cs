@@ -39,19 +39,19 @@ namespace SmartDevelopment.Identity.Stores
 
         public override async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await _dal.InsertOrUpdateAsync(new List<TUser> { user }).ConfigureAwait(false);
+            await _dal.InsertOrUpdateAsync(new List<TUser> { user });
             return IdentityResult.Success;
         }
 
         public override async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await _dal.UpdateAsync(new List<TUser> { user }).ConfigureAwait(false);
+            await _dal.UpdateAsync(new List<TUser> { user });
             return IdentityResult.Success;
         }
 
         public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await _dal.DeleteAsync(user).ConfigureAwait(false);
+            await _dal.DeleteAsync(user);
             return IdentityResult.Success;
         }
 
@@ -63,7 +63,7 @@ namespace SmartDevelopment.Identity.Stores
 
         public override async Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var users = await _dal.GetAsync(PagingInfo.OneItem, v => v.NormalizedUserName.Equals(normalizedUserName)).ConfigureAwait(false);
+            var users = await _dal.GetAsync(PagingInfo.OneItem, v => v.NormalizedUserName.Equals(normalizedUserName));
             return users.FirstOrDefault();
         }
 
@@ -74,7 +74,7 @@ namespace SmartDevelopment.Identity.Stores
 
         protected override async Task<TUserLogin> FindUserLoginAsync(ObjectId userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            var user = await _dal.GetAsync(userId).ConfigureAwait(false);
+            var user = await _dal.GetAsync(userId);
 
             return (TUserLogin)user?.Logins.Find(l =>
                     l.LoginProvider == loginProvider
@@ -86,7 +86,7 @@ namespace SmartDevelopment.Identity.Stores
             var user = await _dal.GetAsync(new PagingInfo(0, 2), v =>
                 v.Logins.Any(l =>
                     l.LoginProvider == loginProvider
-                    && l.ProviderKey == providerKey)).ConfigureAwait(false);
+                    && l.ProviderKey == providerKey));
 
             return (TUserLogin)user.SingleOrDefault()?.Logins.Find(l =>
                     l.LoginProvider == loginProvider
@@ -157,14 +157,14 @@ namespace SmartDevelopment.Identity.Stores
 
         public override async Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var users = await _dal.GetAsync(PagingInfo.OneItem, u => u.NormalizedEmail == normalizedEmail).ConfigureAwait(false);
+            var users = await _dal.GetAsync(PagingInfo.OneItem, u => u.NormalizedEmail == normalizedEmail);
             return users.FirstOrDefault();
         }
 
         public override async Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await _dal.GetAsync(null, v => v.Claims.Any(userclaims => userclaims.ClaimValue == claim.Value
-                          && userclaims.ClaimType == claim.Type)).ConfigureAwait(false);
+                          && userclaims.ClaimType == claim.Type));
         }
 
         protected override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
@@ -174,9 +174,9 @@ namespace SmartDevelopment.Identity.Stores
 
         protected override async Task AddUserTokenAsync(TUserToken token)
         {
-            var user = await _dal.GetAsync(token.UserId).ConfigureAwait(false);
+            var user = await _dal.GetAsync(token.UserId);
             user.Tokens.Add(token);
-            await UpdateAsync(user).ConfigureAwait(false);
+            await UpdateAsync(user);
         }
 
         public override async Task SetTokenAsync(TUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
@@ -203,14 +203,14 @@ namespace SmartDevelopment.Identity.Stores
 
         protected override async Task RemoveUserTokenAsync(TUserToken token)
         {
-            var user = await _dal.GetAsync(token.UserId).ConfigureAwait(false);
+            var user = await _dal.GetAsync(token.UserId);
             user.Tokens.Remove(token);
-            await UpdateAsync(user).ConfigureAwait(false);
+            await UpdateAsync(user);
         }
 
         public override async Task<IList<TUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await _dal.GetAsync(null, v => v.Roles.Contains(normalizedRoleName)).ConfigureAwait(false);
+            return await _dal.GetAsync(null, v => v.Roles.Contains(normalizedRoleName));
         }
 
         public override Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
@@ -241,7 +241,7 @@ namespace SmartDevelopment.Identity.Stores
 
         protected override async Task<TRole> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
-            var roles = await _rolesDal.GetAsync(new PagingInfo(0, 2), v => v.NormalizedName == normalizedRoleName).ConfigureAwait(false);
+            var roles = await _rolesDal.GetAsync(new PagingInfo(0, 2), v => v.NormalizedName == normalizedRoleName);
             return roles.SingleOrDefault();
         }
 
@@ -250,7 +250,7 @@ namespace SmartDevelopment.Identity.Stores
             var role = _rolesDal.GetAsync(userId);
             var user = _dal.GetAsync(userId);
 
-            await Task.WhenAll(role, user).ConfigureAwait(false);
+            await Task.WhenAll(role, user);
 
             if (role.Result != null && user.Result != null)
                 return new TUserRole { RoleId = roleId, UserId = userId };

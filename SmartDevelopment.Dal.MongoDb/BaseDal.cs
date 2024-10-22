@@ -60,7 +60,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
         public async Task<ITransaction> OpenTransaction()
         {
-            var session = await DatabaseFactory.Get().Client.StartSessionAsync().ConfigureAwait(false);
+            var session = await DatabaseFactory.Get().Client.StartSessionAsync();
             session.StartTransaction();
             return new Transaction(session);
         }
@@ -99,7 +99,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
             try
             {
-                await Collection.InsertOneAsync(entity).ConfigureAwait(false);
+                await Collection.InsertOneAsync(entity);
             }
             catch (MongoWriteException ex) when (ex.InnerException is MongoBulkWriteException<TEntity>)
             {
@@ -119,7 +119,7 @@ namespace SmartDevelopment.Dal.MongoDb
             {
                 try
                 {
-                    await Collection.InsertManyAsync(entities, new InsertManyOptions { IsOrdered = false }).ConfigureAwait(false);
+                    await Collection.InsertManyAsync(entities, new InsertManyOptions { IsOrdered = false });
                 }
                 catch (MongoWriteException ex) when (ex.InnerException is MongoBulkWriteException<TEntity>)
                 {
@@ -145,7 +145,7 @@ namespace SmartDevelopment.Dal.MongoDb
                         entities.Where(v => v.Id == ObjectId.Empty).Select(v => new InsertOneModel<TEntity>(v)).Cast<WriteModel<TEntity>>();
                     var result = await
                         Collection.BulkWriteAsync(upsertOperations.Union(insertIperations).ToList(),
-                            new BulkWriteOptions { IsOrdered = false }, CancellationToken.None).ConfigureAwait(false);
+                            new BulkWriteOptions { IsOrdered = false }, CancellationToken.None);
 
                     return new InsertOrUpdateResult(result.InsertedCount, result.ModifiedCount);
                 }
@@ -171,8 +171,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
             var result =
                 await
-                    Collection.ReplaceOneAsync(v => v.Id.Equals(id), entity, new ReplaceOptions { IsUpsert = true })
-                        .ConfigureAwait(false);
+                    Collection.ReplaceOneAsync(v => v.Id.Equals(id), entity, new ReplaceOptions { IsUpsert = true });
 
             if (result.IsAcknowledged && result.MatchedCount == 0)
                 throw new EntityNotFoundException(typeof(TEntity), id);
@@ -189,8 +188,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
             var result =
                 await
-                    Collection.ReplaceOneAsync(v => v.Id.Equals(id), entity, new ReplaceOptions { IsUpsert = true })
-                        .ConfigureAwait(false);
+                    Collection.ReplaceOneAsync(v => v.Id.Equals(id), entity, new ReplaceOptions { IsUpsert = true });
 
             return entity;
         }
@@ -210,7 +208,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
             var result = await Collection.BulkWriteAsync(
                 entities.Select(v => new ReplaceOneModel<TEntity>(Filter.Eq(f => f.Id, v.Id), v)),
-                new BulkWriteOptions { IsOrdered = false }).ConfigureAwait(false);
+                new BulkWriteOptions { IsOrdered = false });
 
             if (result.IsAcknowledged && result.MatchedCount != entities.Count)
                 throw new EntityNotFoundException(typeof(TEntity), string.Join(",", entities.Select(v => v.Id)));
@@ -263,7 +261,7 @@ namespace SmartDevelopment.Dal.MongoDb
         protected async Task<long> SetAsync(FilterDefinition<TEntity> filter, UpdateDefinition<TEntity> update,
             UpdateOptions options = null)
         {
-            var result = await Collection.UpdateManyAsync(filter, update.Set(v => v.ModifiedAt, DateTime.UtcNow), options).ConfigureAwait(false);
+            var result = await Collection.UpdateManyAsync(filter, update.Set(v => v.ModifiedAt, DateTime.UtcNow), options);
             return result.ModifiedCount + (result.UpsertedId != null ? 1 : 0);
         }
 
@@ -294,7 +292,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
         public virtual async Task DeleteAsync(ObjectId id)
         {
-            var result = await Collection.DeleteOneAsync(v => v.Id.Equals(id)).ConfigureAwait(false);
+            var result = await Collection.DeleteOneAsync(v => v.Id.Equals(id));
 
             if (result.IsAcknowledged && result.DeletedCount == 0)
                 throw new EntityNotFoundException(typeof(TEntity), id);
@@ -307,7 +305,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
         protected async Task<long> DeleteAsync(FilterDefinition<TEntity> filter)
         {
-            var result = await Collection.DeleteManyAsync(filter).ConfigureAwait(false);
+            var result = await Collection.DeleteManyAsync(filter);
             return result.DeletedCount;
         }
 
@@ -317,7 +315,7 @@ namespace SmartDevelopment.Dal.MongoDb
 
         public virtual async Task<TEntity> GetAsync(ObjectId id)
         {
-            var result = await GetAsync(new PagingInfo(0, 1), Filter.Eq(v => v.Id, id)).ConfigureAwait(false);
+            var result = await GetAsync(new PagingInfo(0, 1), Filter.Eq(v => v.Id, id));
             return result.FirstOrDefault();
         }
 
@@ -392,7 +390,7 @@ namespace SmartDevelopment.Dal.MongoDb
             return ((IMongoDbDal<TEntity>)this).AsMongoDbQueryable();
         }
 
-        IMongoQueryable<TEntity> IMongoDbDal<TEntity>.AsMongoDbQueryable()
+        IQueryable<TEntity> IMongoDbDal<TEntity>.AsMongoDbQueryable()
         {
             return Collection.AsQueryable();
         }

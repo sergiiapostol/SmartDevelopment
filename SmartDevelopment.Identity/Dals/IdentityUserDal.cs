@@ -18,21 +18,21 @@ namespace SmartDevelopment.Identity.Dals
         {
             return Collection.Indexes.CreateManyAsync(new List<CreateIndexModel<TUser>>
             {
-                new CreateIndexModel<TUser>(
+                new(
                     Builders<TUser>.IndexKeys
                         .Descending(v => v.NormalizedUserName),
                     new CreateIndexOptions<TUser>
                     {
                         Background = true, Unique = true
                     }),
-                new CreateIndexModel<TUser>(
+                new(
                     Builders<TUser>.IndexKeys
                         .Descending(v => v.NormalizedEmail),
                     new CreateIndexOptions<TUser>
                     {
                         Background = true, Sparse = true
                     }),
-                new CreateIndexModel<TUser>(
+                new(
                     Builders<TUser>.IndexKeys
                         .Descending("Logins.LoginProvider")
                         .Descending("Logins.ProviderKey"),
@@ -40,7 +40,7 @@ namespace SmartDevelopment.Identity.Dals
                     {
                         Background = true, Unique = true, Sparse = true
                     }),
-                new CreateIndexModel<TUser>(
+                new(
                     Builders<TUser>.IndexKeys
                         .Descending("Claims.ClaimValue")
                         .Descending("Claims.ClaimType"),
@@ -48,7 +48,7 @@ namespace SmartDevelopment.Identity.Dals
                     {
                         Background = true
                     }),
-                new CreateIndexModel<TUser>(
+                new(
                     Builders<TUser>.IndexKeys
                         .Descending(v => v.Roles),
                     new CreateIndexOptions<TUser>

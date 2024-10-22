@@ -24,7 +24,7 @@ namespace SmartDevelopment.Jobs.EmailSender
         {
             log.LogInformation($"{nameof(ProcessEmail)} for {email} started at: {DateTime.UtcNow}");
 
-            await _sender.Send(email).ConfigureAwait(false);
+            await _sender.Send(email);
 
             log.LogInformation($"{nameof(ProcessEmail)} for {email} completed at: {DateTime.UtcNow}");
         }

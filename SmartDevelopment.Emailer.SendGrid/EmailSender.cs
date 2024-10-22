@@ -35,7 +35,7 @@ namespace SmartDevelopment.Emailer.SendGrid
 
             try
             {
-                var response = await _sendGridClient.SendEmailAsync(emailRequest).ConfigureAwait(false);
+                var response = await _sendGridClient.SendEmailAsync(emailRequest);
                 _logger.LogDebug($"SendGrid response {response.StatusCode}");
             }
             catch (Exception ex)
@@ -45,7 +45,7 @@ namespace SmartDevelopment.Emailer.SendGrid
             }
         }
 
-        private SendGridMessage BuildMessage(EmailMessage email)
+        private static SendGridMessage BuildMessage(EmailMessage email)
         {
             var msg = new SendGridMessage { From = new EmailAddress(email.From) };
             msg.AddTo(email.To);

@@ -27,19 +27,19 @@ namespace SmartDevelopment.Identity.Stores
 
         public override async Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken)
         {
-            await _dal.InsertAsync(role).ConfigureAwait(false);
+            await _dal.InsertAsync(role);
             return IdentityResult.Success;
         }
 
         public override async Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken)
         {
-            await _dal.UpdateAsync(role.Id, role).ConfigureAwait(false);
+            await _dal.UpdateAsync(role.Id, role);
             return IdentityResult.Success;
         }
 
         public override async Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken)
         {
-            await _dal.DeleteAsync(role.Id).ConfigureAwait(false);
+            await _dal.DeleteAsync(role.Id);
             return IdentityResult.Success;
         }
 
@@ -77,7 +77,7 @@ namespace SmartDevelopment.Identity.Stores
 
         public override async Task<TRole> FindByNameAsync(string normalizedName, CancellationToken cancellationToken)
         {
-            var roles = await _dal.GetAsync(PagingInfo.OneItem, v => v.NormalizedName == normalizedName).ConfigureAwait(false);
+            var roles = await _dal.GetAsync(PagingInfo.OneItem, v => v.NormalizedName == normalizedName);
             return roles.FirstOrDefault();
         }
 

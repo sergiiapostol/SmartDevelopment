@@ -7,7 +7,7 @@ namespace SmartDevelopment.AzureStorage.Blobs
     {
         private readonly ILogger _logger;
 
-        private readonly Dictionary<string, string> _contentTypes = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> _contentTypes = new()
         {
             {".x3d", "application/vnd.hzn-3d-crossword"},
             {".3gp", "video/3gpp"},

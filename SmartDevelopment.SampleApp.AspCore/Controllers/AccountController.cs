@@ -50,10 +50,10 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
                 Email = model.Email,
                 NormalizedEmail = _userManager.NormalizeEmail(model.Email)
             };
-            var result = await _userManager.CreateAsync(user).ConfigureAwait(false);
+            var result = await _userManager.CreateAsync(user);
             if (result.Succeeded)
             {
-                result = await _userManager.AddPasswordAsync(user, model.Password).ConfigureAwait(false);
+                result = await _userManager.AddPasswordAsync(user, model.Password);
                 if (result.Succeeded)
                     return Ok();
             }
@@ -68,14 +68,14 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await _userManager.FindByNameAsync(model.Email).ConfigureAwait(false);
+            var user = await _userManager.FindByNameAsync(model.Email);
             if (user == null)
                 return NotFound();
 
-            if (!await _userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(false))
+            if (!await _userManager.CheckPasswordAsync(user, model.Password))
                 return Unauthorized();
 
-            var token = await GetJwtSecurityToken(user).ConfigureAwait(false);
+            var token = await GetJwtSecurityToken(user);
 
             var response = new TokenResult
             {
@@ -90,7 +90,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         {
             const string signinAlgorithm = SecurityAlgorithms.HmacSha256;
 
-            var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
+            var userClaims = await _userManager.GetClaimsAsync(user);
 
             return new JwtSecurityToken(
                 _configuration.Issuer,
@@ -101,12 +101,12 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
             );
         }
 
-        private static IEnumerable<Claim> GetTokenClaims(IdentityUser user)
+        private static List<Claim> GetTokenClaims(IdentityUser user)
         {
-            return new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.Id.ToString())
-            };
+            return
+            [
+                new(JwtRegisteredClaimNames.UniqueName, user.Id.ToString())
+            ];
         }
     }
 }

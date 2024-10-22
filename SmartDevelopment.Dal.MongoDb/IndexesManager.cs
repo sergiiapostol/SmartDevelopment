@@ -24,7 +24,7 @@ namespace SmartDevelopment.Dal.MongoDb
             {
                 try
                 {
-                    await indexedSource.EnsureIndex().ConfigureAwait(false);
+                    await indexedSource.EnsureIndex();
                 }
                 catch (Exception ex)
                 {

@@ -61,7 +61,7 @@ namespace SmartDevelopment.Caching.OutputCaching
 
                 if (cachedResponse != null)
                 {
-                    await cachedResponse.Apply(context).ConfigureAwait(false);
+                    await cachedResponse.Apply(context);
                     return;
                 }
             }
@@ -69,7 +69,7 @@ namespace SmartDevelopment.Caching.OutputCaching
                 _logger.Exception(ex);
             }
 
-            var cachedItem = await CaptureResponse(context).ConfigureAwait(false);
+            var cachedItem = await CaptureResponse(context);
             if (cachedItem != null)
             {
                 try
@@ -137,7 +137,7 @@ namespace SmartDevelopment.Caching.OutputCaching
 
             var bytes = buffer.ToArray();
 
-            await responseStream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+            await responseStream.WriteAsync(bytes, 0, bytes.Length);
 
             if (context.Response.StatusCode != 200) return null;
 

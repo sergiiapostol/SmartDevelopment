@@ -8,7 +8,7 @@ namespace SmartDevelopment.SampleApp.AspCore.Configuration
         public string SignKey { get; set; }
 
         public SymmetricSecurityKey SecurityKey =>
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SignKey));
+            new(Encoding.UTF8.GetBytes(SignKey));
 
         public string Audience { get; set; }
 

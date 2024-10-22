@@ -21,8 +21,8 @@ namespace SmartDevelopment.SampleApp.AspCore.Controllers
         [OutputCache(false, SlidingDurationInSec = 500)]
         [HttpGet, Route("Cache")]
         public object CacheCreate()
-        {            
-            _outputCacheManager.TagCache(ControllerContext.HttpContext, new Dictionary<string, string> { { "TagKey", "TagValue" } });
+        {
+            OutputCacheManager.TagCache(ControllerContext.HttpContext, new Dictionary<string, string> { { "TagKey", "TagValue" } });
 
             return null;
         }

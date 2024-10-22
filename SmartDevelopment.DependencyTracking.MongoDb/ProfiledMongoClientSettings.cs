@@ -10,7 +10,7 @@ namespace SmartDevelopment.DependencyTracking.MongoDb
 {
     internal class ProfiledMongoClientSettings
     {
-        private readonly ConcurrentDictionary<int, DependencyProfiler.DependencyItem> _queriesBuffer = new ConcurrentDictionary<int, DependencyProfiler.DependencyItem>();
+        private readonly ConcurrentDictionary<int, DependencyProfiler.DependencyItem> _queriesBuffer = new();
 
         private readonly DependencyProfiler _dependencyProfiler;
 

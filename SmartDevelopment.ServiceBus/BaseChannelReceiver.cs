@@ -29,6 +29,8 @@ namespace SmartDevelopment.ServiceBus
             Processor.ProcessErrorAsync -= ErrorHandler;            
             await Processor.DisposeAsync();
             await Client.DisposeAsync();
+
+            GC.SuppressFinalize(this);
         }
 
         public Task Init()

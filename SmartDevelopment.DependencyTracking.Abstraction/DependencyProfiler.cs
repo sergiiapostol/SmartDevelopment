@@ -85,7 +85,7 @@ namespace SmartDevelopment.DependencyTracking
                 }
                 else if (!string.IsNullOrEmpty(Description))
                 {
-                    Description = Description.Substring(0, Math.Min(50, Description.Length - 1));
+                    Description = Description[..Math.Min(50, Description.Length - 1)];
                 }
                 else
                 {
@@ -93,6 +93,8 @@ namespace SmartDevelopment.DependencyTracking
                 }
 
                 _dependencyStore.StoreDependency(this);
+
+                GC.SuppressFinalize(this);
             }
         }
     }

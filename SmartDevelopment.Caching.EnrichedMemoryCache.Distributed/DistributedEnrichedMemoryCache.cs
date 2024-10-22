@@ -9,7 +9,7 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
 {
     public class DistributedEnrichedMemoryCache : IEnrichedMemoryCache
     {
-        private readonly IChannelSender<CacheReleaseEvent> _sender;
+        private readonly ReleaseCacheSender _sender;
         private readonly IChannelReceiver<CacheReleaseEvent> _receiver;
         private readonly EnrichedMemoryCache _enrichedMemoryCache;
         private readonly ILogger _logger;
@@ -50,10 +50,10 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
 
         public async Task Remove(string key)
         {
-            await _enrichedMemoryCache.Remove(key).ConfigureAwait(false);
+            await _enrichedMemoryCache.Remove(key);
             try
             {
-                await _sender.Add(new CacheReleaseEvent { Key = key }).ConfigureAwait(false);
+                await _sender.Add(new CacheReleaseEvent { Key = key });
             }catch(Exception ex)
             {
                 _logger.Exception(ex);
@@ -62,10 +62,10 @@ namespace SmartDevelopment.Caching.EnrichedMemoryCache.Distributed
 
         public async Task Remove(Dictionary<string, string> tags)
         {
-            await _enrichedMemoryCache.Remove(tags).ConfigureAwait(false);
+            await _enrichedMemoryCache.Remove(tags);
             try
             {
-                await _sender.Add(new CacheReleaseEvent { Tags = tags }).ConfigureAwait(false);
+                await _sender.Add(new CacheReleaseEvent { Tags = tags });
             }
             catch (Exception ex)
             {
